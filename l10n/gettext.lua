@@ -22,6 +22,9 @@ local plugin_path = lib_path:gsub("/+", "/"):gsub("[\\/]l10n[\\/]", "")
 local NewGetText = {
     dirname = string.format("%s/l10n", plugin_path)
 }
+-- KOReader gettext instances are callable tables; preserve that behavior when
+-- the plugin's translation table is copied into this proxy target.
+setmetatable(NewGetText, getmetatable(GetText))
 local selected_language = G_reader_settings:readSetting("notifications_language") or "zh_CN"
 
 local changeLang = function(new_lang)
