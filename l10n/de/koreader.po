@@ -419,3 +419,48 @@ msgstr "Unverändert"
 
 msgid "Choose what to display when weather data is unavailable (no internet, API error, etc.). Image folders and other options are configured in KOReader's Sleep screen settings."
 msgstr "Wähle, was angezeigt werden soll, wenn Wetterdaten nicht verfügbar sind (kein Internet, API-Fehler, etc.). Bilderordner und andere Optionen werden in KOReaders Ruhebildschirm-Einstellungen konfiguriert."
+
+msgid "Weather & Notifications Lockscreen"
+msgstr "Wetter- und Benachrichtigungs-Ruhebildschirm"
+
+msgid "Displays weather or read-only notifications on the sleep screen."
+msgstr "Zeigt Wetter oder reine Benachrichtigungen auf dem Ruhebildschirm an."
+
+msgid "Show notifications on sleep screen"
+msgstr "Benachrichtigungen auf dem Ruhebildschirm anzeigen"
+
+msgid "AI NOTIFICATIONS"
+msgstr "KI-BENACHRICHTIGUNGEN"
+
+msgid "%1 pending"
+msgstr "%1 ausstehend"
+
+msgid "Set the notification feed URL in Tools > Weather & Notifications Lockscreen."
+msgstr "Lege die URL des Benachrichtigungsfeeds unter Werkzeuge > Wetter- und Benachrichtigungs-Ruhebildschirm fest."
+
+msgid "No pending notifications."
+msgstr "Keine ausstehenden Benachrichtigungen."
+
+msgid "Not updated yet"
+msgstr "Noch nicht aktualisiert"
+
+msgid "cached"
+msgstr "aus Cache"
+
+msgid "Updated: %1"
+msgstr "Aktualisiert: %1"
+
+msgid "Notification feed URL (not set)"
+msgstr "URL des Benachrichtigungsfeeds (nicht festgelegt)"
+
+msgid "Notification feed URL (configured)"
+msgstr "URL des Benachrichtigungsfeeds (festgelegt)"
+
+msgid "Notification feed URL"
+msgstr "URL des Benachrichtigungsfeeds"
+
+msgid "http://computer.local/notifications.json"
+msgstr "http://computer.local/notifications.json"
+
+msgid "Enter a trusted HTTP or HTTPS JSON feed. Do not put passwords or API keys in the URL."
+msgstr "Gib einen vertrauenswürdigen HTTP- oder HTTPS-JSON-Feed ein. Füge keine Passwörter oder API-Schlüssel in die URL ein."

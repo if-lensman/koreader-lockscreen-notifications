@@ -18,6 +18,7 @@ local ScreenSaverWidget = require("ui/widget/screensaverwidget")
 local logger = require("logger")
 local _ = require("l10n/gettext")
 local WeatherAPI = require("weather_api")
+local NotificationAPI = require("notification_api")
 local WeatherUtils = require("weather_utils")
 local WeatherMenu = require("weather_menu")
 local WeatherDashboard = require("weather_dashboard")
@@ -107,6 +108,10 @@ function WeatherLockscreen:initDefaultSettings()
 
         -- Debug Options
         weather_debug_options = false, -- Off by default
+
+        -- Read-only notification canvas
+        notification_feed_url = "",
+        notification_cache_max_age = 86400,
     }
 
     local settings_changed = false
@@ -162,7 +167,7 @@ function WeatherLockscreen:init()
             UIManager:scheduleIn(0, function()
                 local Screensaver = require("ui/screensaver")
                 local ss_type = G_reader_settings:readSetting("screensaver_type")
-                if Device.screen_saver_mode and ss_type == "weather" then
+                if Device.screen_saver_mode and (ss_type == "weather" or ss_type == "notifications") then
                     Screensaver:show()
                 else
                     logger.info("WeatherLockscreen: Skipping screensaver redraw on scheduled wakeup")
@@ -183,7 +188,8 @@ function WeatherLockscreen:init()
     self.chargingRefreshCallback = function()
         -- Stop if the weather sleep screen is no longer up, or we're off power.
         if not (Device.screen_saver_mode
-                and G_reader_settings:readSetting("screensaver_type") == "weather")
+                and (G_reader_settings:readSetting("screensaver_type") == "weather"
+                    or G_reader_settings:readSetting("screensaver_type") == "notifications"))
             or not WeatherUtils:isOnExternalPower() then
             self:exitChargingRefresh()
             return
@@ -226,7 +232,7 @@ end
 
 function WeatherLockscreen:addToMainMenu(menu_items)
     menu_items.weather_lockscreen = {
-        text = _("Weather Lockscreen"),
+        text = _("Weather & Notifications Lockscreen"),
         sub_item_table_func = function()
             return WeatherMenu:getSubMenuItems(self)
         end,
@@ -288,9 +294,9 @@ function WeatherLockscreen:patchScreensaver()
 
     Screensaver.show = function(screensaver_instance)
         local ss_type = G_reader_settings:readSetting("screensaver_type")
-        if ss_type == "weather" then
-            screensaver_instance.screensaver_type = "weather"
-            logger.dbg("WeatherLockscreen: Weather screensaver activated")
+        if ss_type == "weather" or ss_type == "notifications" then
+            screensaver_instance.screensaver_type = ss_type
+            logger.dbg("WeatherLockscreen: Managed screensaver activated:", ss_type)
 
             -- Schedule periodic refresh when screen locks (RTC on battery, or a
             -- standby timer while charging since the device won't deep-suspend).
@@ -330,7 +336,7 @@ function WeatherLockscreen:patchScreensaver()
             -- Define function to create and show weather widget
             local function screensaverShow()
                 logger.dbg("WeatherLockscreen: Creating widget")
-                local weather_widget = plugin_instance:createWeatherWidget()
+                local weather_widget = plugin_instance:createScreensaverWidget(ss_type)
 
                 -- The screensaver widget currently on screen, if any (ours or a
                 -- fallback one created through the original show). Closing a
@@ -354,7 +360,7 @@ function WeatherLockscreen:patchScreensaver()
                     logger.dbg("WeatherLockscreen: Weather widget created successfully")
                     local bg_color = Blitbuffer.COLOR_WHITE
                     local display_style = G_reader_settings:readSetting("weather_display_style") or "default"
-                    if display_style == "nightowl" then
+                    if ss_type == "weather" and display_style == "nightowl" then
                         bg_color = G_reader_settings:isTrue("night_mode") and Blitbuffer.COLOR_WHITE or
                             Blitbuffer.COLOR_BLACK
                     end
@@ -424,7 +430,7 @@ function WeatherLockscreen:patchScreensaver()
                     Screensaver._orig_show_before_weather(screensaver_instance)
 
                     -- Restore weather as the screensaver type (don't flush to disk)
-                    G_reader_settings:saveSetting("screensaver_type", "weather")
+                    G_reader_settings:saveSetting("screensaver_type", ss_type)
                 end
             end
             -- Create weather widget
@@ -490,9 +496,11 @@ function WeatherLockscreen:patchDofile()
 
                     -- Add weather option
                     local weather_item = genMenuItem(_("Show weather on sleep screen"), "screensaver_type", "weather")
+                    local notification_item = genMenuItem(_("Show notifications on sleep screen"), "screensaver_type", "notifications")
 
                     -- Insert before "Leave screen as-is" option (position 6)
                     table.insert(wallpaper_submenu, 6, weather_item)
+                    table.insert(wallpaper_submenu, 7, notification_item)
 
                     logger.dbg("WeatherLockscreen: Added weather option to screensaver menu")
                 end
@@ -536,6 +544,21 @@ function WeatherLockscreen:createWeatherWidget()
     local display_module = require(display_modules[display_style] or "display_default")
 
     return display_module:create(self, weather_data), false
+end
+
+function WeatherLockscreen:createScreensaverWidget(screensaver_type)
+    if screensaver_type ~= "notifications" then
+        return self:createWeatherWidget()
+    end
+
+    local notification_data = NotificationAPI:fetchNotificationData(self)
+    if not notification_data then
+        logger.warn("WeatherLockscreen: No notification data available, using fallback")
+        return nil, true
+    end
+
+    local NotificationDisplay = require("display_notifications")
+    return NotificationDisplay:create(self, notification_data), false
 end
 
 -- Choose the refresh mechanism based on power state. On external power the
@@ -641,7 +664,8 @@ end
 function WeatherLockscreen:onPowerStateChanged()
     -- Active Sleep: re-pick the refresh mechanism if the weather screensaver is
     -- active (RTC on battery, standby timer while charging).
-    if Device.screen_saver_mode and G_reader_settings:readSetting("screensaver_type") == "weather" then
+    local screensaver_type = G_reader_settings:readSetting("screensaver_type")
+    if Device.screen_saver_mode and (screensaver_type == "weather" or screensaver_type == "notifications") then
         logger.dbg("WeatherLockscreen: Power state changed, re-evaluating refresh mechanism")
         self:scheduleRefresh()
     end
@@ -742,7 +766,8 @@ function WeatherLockscreen:onResume()
             -- The user woke the device (or switched wallpaper) in the meantime:
             -- it's theirs now, don't put it back to sleep.
             if not (Device.screen_saver_mode
-                    and G_reader_settings:readSetting("screensaver_type") == "weather") then
+                    and (G_reader_settings:readSetting("screensaver_type") == "weather"
+                        or G_reader_settings:readSetting("screensaver_type") == "notifications")) then
                 logger.info("WeatherLockscreen: Sleep screen gone, skipping re-suspend")
                 return
             end

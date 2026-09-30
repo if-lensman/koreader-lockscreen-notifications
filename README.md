@@ -1,5 +1,11 @@
 # Weather Lockscreen Plugin for KOReader
 
+This public fork of [loeffner/WeatherLockscreen](https://github.com/loeffner/WeatherLockscreen) adds a read-only notification canvas while preserving the upstream weather screens and Active Sleep scheduler. The notification canvas can be selected in **Settings > Screen > Sleep Screen > Wallpaper**. Set its feed URL under **Tools > Weather & Notifications Lockscreen**.
+
+The Kindle fetches a small JSON document when the configured refresh mechanism runs, caches the last successful response, and renders up to three short notification cards. It does not approve items, execute commands, or contact an AI provider directly. See [`docs/notification-feed.md`](docs/notification-feed.md) for the feed format and privacy notes.
+
+This fork remains under the upstream GNU AGPL v3 license.
+
 A comprehensive KOReader plugin that displays beautiful weather information on your device's sleep screen.
 
 ![Beautiful Weather Lockscreen](resources/beautiful.jpg)

@@ -24,6 +24,51 @@ msgstr ""
 msgid "Weather Lockscreen"
 msgstr ""
 
+msgid "Weather & Notifications Lockscreen"
+msgstr ""
+
+msgid "Displays weather or read-only notifications on the sleep screen."
+msgstr ""
+
+msgid "Show notifications on sleep screen"
+msgstr ""
+
+msgid "AI NOTIFICATIONS"
+msgstr ""
+
+msgid "%1 pending"
+msgstr ""
+
+msgid "Set the notification feed URL in Tools > Weather & Notifications Lockscreen."
+msgstr ""
+
+msgid "No pending notifications."
+msgstr ""
+
+msgid "Not updated yet"
+msgstr ""
+
+msgid "cached"
+msgstr ""
+
+msgid "Updated: %1"
+msgstr ""
+
+msgid "Notification feed URL (not set)"
+msgstr ""
+
+msgid "Notification feed URL (configured)"
+msgstr ""
+
+msgid "Notification feed URL"
+msgstr ""
+
+msgid "http://computer.local/notifications.json"
+msgstr ""
+
+msgid "Enter a trusted HTTP or HTTPS JSON feed. Do not put passwords or API keys in the URL."
+msgstr ""
+
 msgid "Displays weather information on the sleep screen. Select Weather option in Sleep screen > Wallpaper menu to enable."
 msgstr ""
 

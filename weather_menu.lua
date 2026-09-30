@@ -13,6 +13,7 @@ local logger = require("logger")
 local _ = require("l10n/gettext")
 local T = require("ffi/util").template
 local WeatherAPI = require("weather_api")
+local NotificationAPI = require("notification_api")
 local WeatherUtils = require("weather_utils")
 
 local WeatherMenu = {}
@@ -59,6 +60,7 @@ end
 
 function WeatherMenu:getSubMenuItems(plugin_instance)
     local menu_items = {
+        withGlyph(self:getNotificationFeedMenuItem(plugin_instance), ICON.database),
         withGlyph(self:getLocationMenuItem(plugin_instance), ICON.map_marker),
         withGlyph(self:getDisplayStyleMenuItem(plugin_instance), ICON.palette),
         withGlyph(self:getTemperatureScaleMenuItem(plugin_instance), ICON.thermometer),
@@ -90,6 +92,51 @@ function WeatherMenu:getSubMenuItems(plugin_instance)
     table.insert(menu_items, withGlyph(self:getDashboardModeMenuItem(plugin_instance), ICON.view_dashboard))
 
     return menu_items
+end
+
+function WeatherMenu:getNotificationFeedMenuItem(plugin_instance)
+    return {
+        text_func = function()
+            local url = G_reader_settings:readSetting("notification_feed_url") or ""
+            if url == "" then return _("Notification feed URL (not set)") end
+            return _("Notification feed URL (configured)")
+        end,
+        keep_menu_open = true,
+        callback = function(touchmenu_instance)
+            local dialog
+            dialog = InputDialog:new {
+                title = _("Notification feed URL"),
+                input = G_reader_settings:readSetting("notification_feed_url") or "",
+                input_hint = _("http://computer.local/notifications.json"),
+                input_type = "string",
+                description = _("Enter a trusted HTTP or HTTPS JSON feed. Do not put passwords or API keys in the URL."),
+                buttons = {
+                    {
+                        {
+                            text = _("Cancel"),
+                            callback = function() UIManager:close(dialog) end,
+                        },
+                        {
+                            text = _("Save"),
+                            is_enter_default = true,
+                            callback = function()
+                                local url = dialog:getInputValue() or ""
+                                url = url:match("^%s*(.-)%s*$")
+                                NotificationAPI:clearCache()
+                                G_reader_settings:saveSetting("notification_feed_url", url)
+                                G_reader_settings:flush()
+                                plugin_instance.refresh = true
+                                UIManager:close(dialog)
+                                if touchmenu_instance then touchmenu_instance:updateItems() end
+                            end,
+                        },
+                    },
+                },
+            }
+            UIManager:show(dialog)
+            dialog:onShowKeyboard()
+        end,
+    }
 end
 
 function WeatherMenu:getLocationMenuItem(plugin_instance)

@@ -422,3 +422,48 @@ msgstr "Olduğu gibi bırak"
 
 msgid "Choose what to display when weather data is unavailable (no internet, API error, etc.). Image folders and other options are configured in KOReader's Sleep screen settings."
 msgstr "Hava durumu verileri mevcut olmadığında ne gösterileceğini seçin (internet yok, API hatası, vb.). Resim klasörleri ve diğer seçenekler KOReader'ın Uyku ekranı ayarlarında yapılandırılır."
+
+msgid "Weather & Notifications Lockscreen"
+msgstr "Hava Durumu ve Bildirim Kilit Ekranı"
+
+msgid "Displays weather or read-only notifications on the sleep screen."
+msgstr "Uyku ekranında hava durumunu veya salt okunur bildirimleri gösterir."
+
+msgid "Show notifications on sleep screen"
+msgstr "Bildirimleri uyku ekranında göster"
+
+msgid "AI NOTIFICATIONS"
+msgstr "YAPAY ZEKA BİLDİRİMLERİ"
+
+msgid "%1 pending"
+msgstr "%1 bekleyen"
+
+msgid "Set the notification feed URL in Tools > Weather & Notifications Lockscreen."
+msgstr "Bildirim akışı URL'sini Araçlar > Hava Durumu ve Bildirim Kilit Ekranı bölümünde ayarlayın."
+
+msgid "No pending notifications."
+msgstr "Bekleyen bildirim yok."
+
+msgid "Not updated yet"
+msgstr "Henüz güncellenmedi"
+
+msgid "cached"
+msgstr "önbellekten"
+
+msgid "Updated: %1"
+msgstr "Güncellendi: %1"
+
+msgid "Notification feed URL (not set)"
+msgstr "Bildirim akışı URL'si (ayarlanmadı)"
+
+msgid "Notification feed URL (configured)"
+msgstr "Bildirim akışı URL'si (ayarlandı)"
+
+msgid "Notification feed URL"
+msgstr "Bildirim akışı URL'si"
+
+msgid "http://computer.local/notifications.json"
+msgstr "http://computer.local/notifications.json"
+
+msgid "Enter a trusted HTTP or HTTPS JSON feed. Do not put passwords or API keys in the URL."
+msgstr "Güvenilir bir HTTP veya HTTPS JSON akışı girin. URL'ye parola veya API anahtarı eklemeyin."
