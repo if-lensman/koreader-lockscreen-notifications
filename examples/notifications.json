@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-09-30 14:30",
+  "updated_at": "2026-09-30 13:55",
   "unread_count": 2,
   "items": [
     {
-      "title": "Review the project note",
-      "summary": "The AI workflow found a note that may need your attention.",
-      "created_at": "2026-09-30 14:25"
+      "title": "Kindle 通知服务测试",
+      "summary": "如果你能看到这条消息，说明 Kindle 已经从同一 Wi-Fi 下的 Mac 获取到通知。",
+      "created_at": "2026-09-30 13:55"
     },
     {
-      "title": "Daily summary ready",
-      "summary": "Three updates are waiting on your computer.",
-      "created_at": "2026-09-30 13:55"
+      "title": "示例通知",
+      "summary": "编辑 examples/notifications.json 后，刷新即可看到自定义内容。",
+      "created_at": "2026-09-30 13:50"
     }
   ]
 }
