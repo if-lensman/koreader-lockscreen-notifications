@@ -17,6 +17,21 @@ msgstr "天气锁屏"
 msgid "Lock Screen Notifications"
 msgstr "锁屏通知"
 
+msgid "Plugin language: %1"
+msgstr "插件语言：%1"
+
+msgid "Simplified Chinese"
+msgstr "简体中文"
+
+msgid "English"
+msgstr "英语"
+
+msgid "Follow KOReader language"
+msgstr "跟随 KOReader 语言"
+
+msgid "Language changed. Restart KOReader to refresh all menus."
+msgstr "语言已切换。请重启 KOReader 以刷新所有菜单。"
+
 msgid "Displays a read-only notification feed on the KOReader sleep screen. Optional weather display is also included."
 msgstr "在 KOReader 睡眠屏幕上显示只读通知，另包含可选的天气显示。"
 

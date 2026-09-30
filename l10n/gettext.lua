@@ -22,8 +22,13 @@ local plugin_path = lib_path:gsub("/+", "/"):gsub("[\\/]l10n[\\/]", "")
 local NewGetText = {
     dirname = string.format("%s/l10n", plugin_path)
 }
+local selected_language = G_reader_settings:readSetting("notifications_language") or "zh_CN"
 
 local changeLang = function(new_lang)
+    -- Keep the proxy's table identity stable and discard any previous catalog.
+    for key in pairs(NewGetText) do
+        if key ~= "dirname" then NewGetText[key] = nil end
+    end
     -- Save original KOReader gettext state
     local original_l10n_dirname = GetText.dirname
     local original_context = GetText.context
@@ -39,12 +44,15 @@ local changeLang = function(new_lang)
     if ok then
         if (GetText.translation and next(GetText.translation) ~= nil) or
            (GetText.context and next(GetText.context) ~= nil) then
-            -- Deep copy the loaded translation
-            NewGetText = util.tableDeepCopy(GetText)
+            -- Copy the loaded translation into the stable proxy target.
+            local loaded_translation = util.tableDeepCopy(GetText)
+            for key, value in pairs(loaded_translation) do
+                NewGetText[key] = value
+            end
 
             -- Optimize memory: remove translations that exist in KOReader
             -- This prioritizes KOReader's translations and reduces memory usage
-            if NewGetText.translation and original_translation then
+            if selected_language == "system" and NewGetText.translation and original_translation then
                 for k, v in pairs(NewGetText.translation) do
                     if original_translation[k] then
                         NewGetText.translation[k] = nil
@@ -106,7 +114,7 @@ local function createGetTextProxy(new_gettext, gettext)
 
                 -- If plugin translation returns untranslated string, try KOReader's translation
                 if msgstr and compare_str and msgstr == compare_str then
-                    if type(fallback_func) == "function" then
+                    if selected_language == "system" and type(fallback_func) == "function" then
                         msgstr = fallback_func(...)
                     end
                 end
@@ -116,7 +124,7 @@ local function createGetTextProxy(new_gettext, gettext)
         __call = function(_, msgid)
             local msgstr = new_gettext(msgid)
             -- If plugin has no translation, fall back to KOReader
-            if msgstr and msgstr == msgid then
+            if msgstr and msgstr == msgid and selected_language == "system" then
                 msgstr = gettext(msgid)
             end
             return msgstr
@@ -135,9 +143,25 @@ local function createGetTextProxy(new_gettext, gettext)
 end
 
 -- Load translations for current language
-local current_lang = GetText.current_lang or G_reader_settings:readSetting("language")
-if current_lang then
-    changeLang(current_lang)
+local function languageCode(language)
+    if language == "system" then
+        return GetText.current_lang or G_reader_settings:readSetting("language") or "en"
+    end
+    return language
 end
 
-return createGetTextProxy(NewGetText, GetText)
+changeLang(languageCode(selected_language))
+local proxy = createGetTextProxy(NewGetText, GetText)
+
+function proxy.setLanguage(language)
+    if language ~= "zh_CN" and language ~= "en" and language ~= "system" then return false end
+    selected_language = language
+    changeLang(languageCode(language))
+    return true
+end
+
+function proxy.getLanguage()
+    return selected_language
+end
+
+return proxy

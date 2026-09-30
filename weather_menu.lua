@@ -9,6 +9,7 @@
 
 local UIManager = require("ui/uimanager")
 local InputDialog = require("ui/widget/inputdialog")
+local InfoMessage = require("ui/widget/infomessage")
 local logger = require("logger")
 local _ = require("l10n/gettext")
 local T = require("ffi/util").template
@@ -95,8 +96,41 @@ end
 
 function WeatherMenu:getNotificationSubMenuItems(plugin_instance)
     return {
+        withGlyph(self:getNotificationLanguageMenuItem(), ICON.format_title),
         withGlyph(self:getNotificationFeedMenuItem(plugin_instance), ICON.database),
         withGlyph(self:getRtcModeMenuItem(plugin_instance), ICON.sleep),
+    }
+end
+
+function WeatherMenu:getNotificationLanguageMenuItem()
+    local languages = { "zh_CN", "en", "system" }
+    local labels = {
+        zh_CN = "Simplified Chinese",
+        en = "English",
+        system = "Follow KOReader language",
+    }
+    return {
+        text_func = function()
+            return T(_("Plugin language: %1"), _(labels[require("l10n/gettext").getLanguage()]))
+        end,
+        keep_menu_open = true,
+        callback = function(touchmenu_instance)
+            local gettext = require("l10n/gettext")
+            local current = gettext.getLanguage()
+            local index = 1
+            for i, language in ipairs(languages) do
+                if language == current then index = i break end
+            end
+            local next_language = languages[index % #languages + 1]
+            G_reader_settings:saveSetting("notifications_language", next_language)
+            G_reader_settings:flush()
+            gettext.setLanguage(next_language)
+            if touchmenu_instance then touchmenu_instance:updateItems() end
+            UIManager:show(InfoMessage:new {
+                text = _("Language changed. Restart KOReader to refresh all menus."),
+                timeout = 3,
+            })
+        end,
     }
 end
 

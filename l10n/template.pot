@@ -27,6 +27,21 @@ msgstr ""
 msgid "Lock Screen Notifications"
 msgstr ""
 
+msgid "Plugin language: %1"
+msgstr ""
+
+msgid "Simplified Chinese"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "Follow KOReader language"
+msgstr ""
+
+msgid "Language changed. Restart KOReader to refresh all menus."
+msgstr ""
+
 msgid "Displays a read-only notification feed on the KOReader sleep screen. Optional weather display is also included."
 msgstr ""
 

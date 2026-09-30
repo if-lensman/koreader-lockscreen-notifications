@@ -112,6 +112,7 @@ function LockscreenNotifications:initDefaultSettings()
         -- Read-only notification canvas
         notification_feed_url = "",
         notification_cache_max_age = 86400,
+        notifications_language = "zh_CN",
     }
 
     local settings_changed = false

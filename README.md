@@ -1,5 +1,7 @@
 # KOReader Lock Screen Notifications
 
+中文说明：[README.zh-CN.md](README.zh-CN.md)。插件界面默认简体中文，也可在插件菜单切换英语或跟随 KOReader 语言。
+
 A KOReader plugin for showing a small, read-only notification feed on the Kindle sleep screen. The plugin wakes on a configurable interval, fetches JSON from a computer or home server, refreshes the screen, and suspends again. It does not require an AI model on the Kindle and it cannot approve or execute actions.
 
 The notification feature reuses the sleep-screen lifecycle from [loeffner/WeatherLockscreen](https://github.com/loeffner/WeatherLockscreen). The project has a new identity and focuses on lock-screen notifications; optional weather display remains available as a secondary mode.
