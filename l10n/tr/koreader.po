@@ -1,10 +1,10 @@
-# Turkish translation for WeatherLockscreen
+# Turkish translation for KOReader Lock Screen Notifications
 # Copyright (C) 2025
-# This file is distributed under the same license as the WeatherLockscreen package.
+# This file is distributed under the same license as the KOReader Lock Screen Notifications package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: WeatherLockscreen\n"
+"Project-Id-Version: KOReader Lock Screen Notifications\n"
 "POT-Creation-Date: 2025-01-18 12:00+0000\n"
 "PO-Revision-Date: 2025-01-18 12:00+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -423,11 +423,14 @@ msgstr "Olduğu gibi bırak"
 msgid "Choose what to display when weather data is unavailable (no internet, API error, etc.). Image folders and other options are configured in KOReader's Sleep screen settings."
 msgstr "Hava durumu verileri mevcut olmadığında ne gösterileceğini seçin (internet yok, API hatası, vb.). Resim klasörleri ve diğer seçenekler KOReader'ın Uyku ekranı ayarlarında yapılandırılır."
 
-msgid "Weather & Notifications Lockscreen"
-msgstr "Hava Durumu ve Bildirim Kilit Ekranı"
+msgid "Lock Screen Notifications"
+msgstr "Kilit Ekranı Bildirimleri"
 
-msgid "Displays weather or read-only notifications on the sleep screen."
-msgstr "Uyku ekranında hava durumunu veya salt okunur bildirimleri gösterir."
+msgid "Displays a read-only notification feed on the KOReader sleep screen. Optional weather display is also included."
+msgstr "KOReader uyku ekranında salt okunur bir bildirim akışı gösterir. İsteğe bağlı hava durumu görünümü de bulunur."
+
+msgid "Weather display (optional)"
+msgstr "Hava durumu görünümü (isteğe bağlı)"
 
 msgid "Show notifications on sleep screen"
 msgstr "Bildirimleri uyku ekranında göster"
@@ -438,8 +441,8 @@ msgstr "YAPAY ZEKA BİLDİRİMLERİ"
 msgid "%1 pending"
 msgstr "%1 bekleyen"
 
-msgid "Set the notification feed URL in Tools > Weather & Notifications Lockscreen."
-msgstr "Bildirim akışı URL'sini Araçlar > Hava Durumu ve Bildirim Kilit Ekranı bölümünde ayarlayın."
+msgid "Set the notification feed URL in Tools > Lock Screen Notifications."
+msgstr "Bildirim akışı URL'sini Araçlar > Kilit Ekranı Bildirimleri bölümünde ayarlayın."
 
 msgid "No pending notifications."
 msgstr "Bekleyen bildirim yok."

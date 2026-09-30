@@ -132,14 +132,14 @@ function NotificationAPI:fetchNotificationData(plugin)
         return cached or { items = {}, unread_count = 0, needs_setup = true }
     end
     if not url:match("^https?://") or url:match("^https?://[^/]*@") then
-        logger.warn("WeatherLockscreen: Notification feed URL must be HTTP(S) without embedded credentials")
+        logger.warn("LockscreenNotifications: Notification feed URL must be HTTP(S) without embedded credentials")
         if cached and cached.fetched_at and os.time() - cached.fetched_at <= max_age then return cached end
         return nil
     end
 
     local code, body, status = httpGet(url)
     if tonumber(code) ~= 200 then
-        logger.warn("WeatherLockscreen: Notification feed request failed:", code or status or "network error")
+        logger.warn("LockscreenNotifications: Notification feed request failed:", code or status or "network error")
         if cached and cached.fetched_at and os.time() - cached.fetched_at <= max_age then return cached end
         return nil
     end
@@ -148,7 +148,7 @@ function NotificationAPI:fetchNotificationData(plugin)
     local data, err
     if ok then data, err = normalize(payload) else err = payload end
     if not data then
-        logger.warn("WeatherLockscreen: Invalid notification feed:", err or "invalid JSON")
+        logger.warn("LockscreenNotifications: Invalid notification feed:", err or "invalid JSON")
         if cached and cached.fetched_at and os.time() - cached.fetched_at <= max_age then return cached end
         return nil
     end

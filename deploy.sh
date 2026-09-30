@@ -6,13 +6,13 @@ set -e
 
 REMOTE_HOST="${1:-ploetze}"
 REMOTE_PLUGINS_DIR="/mnt/us/koreader/plugins"
-REMOTE_DIR="$REMOTE_PLUGINS_DIR/weatherlockscreen.koplugin"
+REMOTE_DIR="$REMOTE_PLUGINS_DIR/notificationslockscreen.koplugin"
 
 echo "Compiling translations..."
 bash ./compile_translations.sh
 
 TEMP_DIR=$(mktemp -d)
-STAGE_DIR="$TEMP_DIR/weatherlockscreen.koplugin"
+STAGE_DIR="$TEMP_DIR/notificationslockscreen.koplugin"
 mkdir -p "$STAGE_DIR"
 
 # Same exclude list as create-release.sh: ship only what the plugin needs on-device.
@@ -28,14 +28,14 @@ rsync -a --exclude='.git' \
          --exclude='flake.lock' \
          ./ "$STAGE_DIR/"
 
-TARBALL="$TEMP_DIR/weatherlockscreen.tar.gz"
-tar czf "$TARBALL" -C "$TEMP_DIR" weatherlockscreen.koplugin
+TARBALL="$TEMP_DIR/notificationslockscreen.tar.gz"
+tar czf "$TARBALL" -C "$TEMP_DIR" notificationslockscreen.koplugin
 
 echo "Uploading to $REMOTE_HOST..."
-scp "$TARBALL" "$REMOTE_HOST:/tmp/weatherlockscreen.tar.gz"
+scp "$TARBALL" "$REMOTE_HOST:/tmp/notificationslockscreen.tar.gz"
 
 echo "Installing on device..."
-ssh "$REMOTE_HOST" "rm -rf '$REMOTE_DIR' && tar xzf /tmp/weatherlockscreen.tar.gz -C '$REMOTE_PLUGINS_DIR' && rm /tmp/weatherlockscreen.tar.gz"
+ssh "$REMOTE_HOST" "rm -rf '$REMOTE_DIR' && tar xzf /tmp/notificationslockscreen.tar.gz -C '$REMOTE_PLUGINS_DIR' && rm /tmp/notificationslockscreen.tar.gz"
 
 rm -rf "$TEMP_DIR"
 

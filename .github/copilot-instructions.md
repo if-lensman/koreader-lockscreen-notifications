@@ -260,7 +260,7 @@ logger.info("WeatherLockscreen: Info message")
 ## Plugin Conventions
 
 ### Menu Structure
-- Top level: `Tools > Weather Lockscreen`
+- Top level: `Tools > Lock Screen Notifications`; inherited weather controls are under `Tools > Weather display (optional)`
 - Use separators (`separator = true`) to group related settings
 - Use `sub_item_table` for static nested menus
 - Use `sub_item_table_func` for dynamic nested menus

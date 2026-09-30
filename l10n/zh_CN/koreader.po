@@ -1,9 +1,9 @@
-# Chinese (Simplified) translation for WeatherLockscreen
-# This file is distributed under the same license as the WeatherLockscreen package.
+# Chinese (Simplified) translation for KOReader Lock Screen Notifications
+# This file is distributed under the same license as the KOReader Lock Screen Notifications package.
 
 msgid ""
 msgstr ""
-"Project-Id-Version: WeatherLockscreen\n"
+"Project-Id-Version: KOReader Lock Screen Notifications\n"
 "Last-Translator: \n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -13,6 +13,54 @@ msgstr ""
 
 msgid "Weather Lockscreen"
 msgstr "天气锁屏"
+
+msgid "Lock Screen Notifications"
+msgstr "锁屏通知"
+
+msgid "Displays a read-only notification feed on the KOReader sleep screen. Optional weather display is also included."
+msgstr "在 KOReader 睡眠屏幕上显示只读通知，另包含可选的天气显示。"
+
+msgid "Weather display (optional)"
+msgstr "天气显示（可选）"
+
+msgid "Show notifications on sleep screen"
+msgstr "在睡眠屏幕显示通知"
+
+msgid "AI NOTIFICATIONS"
+msgstr "AI 通知"
+
+msgid "%1 pending"
+msgstr "%1 条待处理"
+
+msgid "Set the notification feed URL in Tools > Lock Screen Notifications."
+msgstr "请在“工具 > 锁屏通知”中设置通知源地址。"
+
+msgid "No pending notifications."
+msgstr "没有待处理通知。"
+
+msgid "Not updated yet"
+msgstr "尚未更新"
+
+msgid "cached"
+msgstr "缓存"
+
+msgid "Updated: %1"
+msgstr "更新时间：%1"
+
+msgid "Notification feed URL (not set)"
+msgstr "通知源地址（未设置）"
+
+msgid "Notification feed URL (configured)"
+msgstr "通知源地址（已设置）"
+
+msgid "Notification feed URL"
+msgstr "通知源地址"
+
+msgid "http://computer.local/notifications.json"
+msgstr "http://computer.local/notifications.json"
+
+msgid "Enter a trusted HTTP or HTTPS JSON feed. Do not put passwords or API keys in the URL."
+msgstr "输入可信的 HTTP 或 HTTPS JSON 地址。不要把密码或 API Key 放进地址中。"
 
 msgid "Displays weather information on the sleep screen. Select Weather option in Sleep screen > Wallpaper menu to enable."
 msgstr "在睡眠屏幕上显示天气信息。在睡眠屏幕 > 壁纸菜单中选择“天气”选项以启用。"

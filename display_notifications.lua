@@ -39,7 +39,7 @@ function NotificationDisplay:create(_, data)
 
     if data.needs_setup then
         table.insert(widgets, TextBoxWidget:new {
-            text = _("Set the notification feed URL in Tools > Weather & Notifications Lockscreen."),
+            text = _("Set the notification feed URL in Tools > Lock Screen Notifications."),
             face = Font:getFace("cfont", body_size),
             width = width - margin,
             alignment = "center",

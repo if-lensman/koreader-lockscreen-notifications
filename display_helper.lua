@@ -273,7 +273,7 @@ function DisplayHelper:buildHourlyRow(hourly_data, target_hours, icon_size, font
 end
 
 function DisplayHelper:createLoadingWidget()
-    logger.dbg("WeatherLockscreen: Creating loading icon")
+    logger.dbg("LockscreenNotifications: Creating loading icon")
 
     local icon_size = Screen:scaleBySize(200)
 
@@ -281,7 +281,7 @@ function DisplayHelper:createLoadingWidget()
     local icon_path = DataStorage:getDataDir() .. "/icons/" .. icon_filename
 
     if not util.pathExists(icon_path) then
-        logger.warn("WeatherLockscreen: Loading icon file not found:", icon_path)
+        logger.warn("LockscreenNotifications: Loading icon file not found:", icon_path)
         return nil
     end
 

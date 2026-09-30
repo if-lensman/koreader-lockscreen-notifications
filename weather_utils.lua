@@ -206,14 +206,14 @@ function WeatherUtils:installIcons()
     -- Ensure destination directories exist
     for _, group in ipairs(icon_groups) do
         if not util.directoryExists(group.dest) then
-            logger.dbg("WeatherLockscreen: Creating folder", group.dest)
+            logger.dbg("LockscreenNotifications: Creating folder", group.dest)
             if not util.makePath(group.dest .. "/") then return false end
         end
     end
 
     local plugin_dir = self:getPluginDir()
     if not plugin_dir then
-        logger.warn("WeatherLockscreen: plugin dir unknown; cannot copy bundled icons")
+        logger.warn("LockscreenNotifications: plugin dir unknown; cannot copy bundled icons")
         return false
     end
 
@@ -224,10 +224,10 @@ function WeatherUtils:installIcons()
             if not util.fileExists(dest_file) then
                 local src_file = plugin_dir .. "/" .. group.src_subdir .. "/" .. name .. ".svg"
                 if util.fileExists(src_file) then
-                    logger.dbg("WeatherLockscreen: Copying icon", name)
+                    logger.dbg("LockscreenNotifications: Copying icon", name)
                     ffiUtil.copyFile(src_file, dest_file)
                 else
-                    logger.warn("WeatherLockscreen: bundled icon missing:", src_file)
+                    logger.warn("LockscreenNotifications: bundled icon missing:", src_file)
                 end
             end
         end
@@ -253,7 +253,7 @@ function WeatherUtils:saveWeatherCache(weather_data)
     local json = require("json")
     local success, encoded = pcall(json.encode, cache_data)
     if not success or not encoded then
-        logger.warn("WeatherLockscreen: Failed to encode cache data")
+        logger.warn("LockscreenNotifications: Failed to encode cache data")
         return false
     end
     local f = io.open(cache_file, "w")
@@ -283,7 +283,7 @@ function WeatherUtils:loadWeatherCache(max_age)
 
     local age = os.time() - cache_data.timestamp
     if age > max_age then
-        logger.dbg("WeatherLockscreen: Cache too old")
+        logger.dbg("LockscreenNotifications: Cache too old")
         return nil
     end
 
@@ -299,7 +299,7 @@ function WeatherUtils:clearCache()
     -- Remove cached weather data
     if util.fileExists(cache_file) then
         os.remove(cache_file)
-        logger.dbg("WeatherLockscreen: Removed cached weather data")
+        logger.dbg("LockscreenNotifications: Removed cached weather data")
         cleared = true
     end
 
@@ -310,13 +310,13 @@ function WeatherUtils:clearCache()
         for entry in lfs.dir(icons_cache_dir) do
             if entry ~= "." and entry ~= ".." then
                 local file_path = icons_cache_dir .. entry
-                logger.dbg("WeatherLockscreen: Removed ", file_path)
+                logger.dbg("LockscreenNotifications: Removed ", file_path)
                 os.remove(file_path)
             end
         end
         -- Remove the directory itself
         lfs.rmdir(icons_cache_dir)
-        logger.dbg("WeatherLockscreen: Removed cached weather icons")
+        logger.dbg("LockscreenNotifications: Removed cached weather icons")
         cleared = true
     end
 
@@ -378,7 +378,7 @@ function WeatherUtils:handleSpecialCommand(query)
             text = _("Debug options enabled"),
             timeout = 2,
         })
-        logger.info("WeatherLockscreen: Debug options enabled via search command")
+        logger.info("LockscreenNotifications: Debug options enabled via search command")
         return true
     elseif query_lower == "debug off" or query_lower == "debug disable" then
         G_reader_settings:saveSetting("weather_debug_options", false)
@@ -387,7 +387,7 @@ function WeatherUtils:handleSpecialCommand(query)
             text = _("Debug options disabled"),
             timeout = 2,
         })
-        logger.info("WeatherLockscreen: Debug options disabled via search command")
+        logger.info("LockscreenNotifications: Debug options disabled via search command")
         return true
     end
 
@@ -411,7 +411,7 @@ function WeatherUtils:safeGoOnlineToRun(callback, fallback_callback, suppress_ne
 
     -- First check if we're already online - no need to do anything
     if NetworkMgr:isOnline() then
-        logger.dbg("WeatherLockscreen: Already online, running callback directly")
+        logger.dbg("LockscreenNotifications: Already online, running callback directly")
         if callback then
             callback()
         end
@@ -421,7 +421,7 @@ function WeatherUtils:safeGoOnlineToRun(callback, fallback_callback, suppress_ne
 
     -- If wifi_enable_action is not "turn_on", we can't auto-connect
     if not self:wifiEnableActionTurnOn() then
-        logger.dbg("WeatherLockscreen: wifi_enable_action is not 'turn_on', running fallback")
+        logger.dbg("LockscreenNotifications: wifi_enable_action is not 'turn_on', running fallback")
         if fallback_callback then
             fallback_callback()
         elseif callback then
@@ -440,7 +440,7 @@ function WeatherUtils:safeGoOnlineToRun(callback, fallback_callback, suppress_ne
             if widget and widget.text and type(widget) == "table" and widget.modal ~= nil then
                 local text_lower = widget.text:lower()
                 if text_lower:find("connect") or text_lower:find("wi%-fi") or text_lower:find("network") or text_lower:find("waiting") or text_lower:find("scanning") then
-                    logger.dbg("WeatherLockscreen: Suppressed network info message:", widget.text)
+                    logger.dbg("LockscreenNotifications: Suppressed network info message:", widget.text)
                     return
                 end
             end
@@ -469,11 +469,11 @@ function WeatherUtils:safeGoOnlineToRun(callback, fallback_callback, suppress_ne
             -- Don't call afterWifiAction when set to "prompt" - that would require user interaction
             -- For an unattended weather display, we treat "prompt" as "leave_on" (do nothing)
             logger.dbg(
-                "WeatherLockscreen: wifi_disable_action is 'prompt', skipping afterWifiAction to avoid user interaction")
+                "LockscreenNotifications: wifi_disable_action is 'prompt', skipping afterWifiAction to avoid user interaction")
             return
         end
 
-        logger.dbg("WeatherLockscreen: Calling afterWifiAction (wifi_disable_action=" .. wifi_disable_action .. ")")
+        logger.dbg("LockscreenNotifications: Calling afterWifiAction (wifi_disable_action=" .. wifi_disable_action .. ")")
         NetworkMgr:afterWifiAction()
     end
 
@@ -485,7 +485,7 @@ function WeatherUtils:safeGoOnlineToRun(callback, fallback_callback, suppress_ne
         return NetworkMgr:goOnlineToRun(function()
             callback_invoked = true
             restoreUIManager()
-            logger.dbg("WeatherLockscreen: Network is online, running callback")
+            logger.dbg("LockscreenNotifications: Network is online, running callback")
             if callback then
                 callback()
             end
@@ -495,20 +495,20 @@ function WeatherUtils:safeGoOnlineToRun(callback, fallback_callback, suppress_ne
 
     if not pcall_success then
         -- A crash occurred (e.g., lipc error in kindleGetSavedNetworks)
-        logger.warn("WeatherLockscreen: goOnlineToRun crashed:", go_online_result)
+        logger.warn("LockscreenNotifications: goOnlineToRun crashed:", go_online_result)
         restoreUIManager()
 
         -- Try to recover - wait a bit and check if we're online anyway
         -- The crash might have happened after Wi-Fi was enabled but during network list scan
         UIManager:scheduleIn(2, function()
             if NetworkMgr:isOnline() then
-                logger.info("WeatherLockscreen: Recovered - network came online after crash")
+                logger.info("LockscreenNotifications: Recovered - network came online after crash")
                 if callback then
                     callback()
                 end
                 maybeAfterWifiAction()
             else
-                logger.warn("WeatherLockscreen: Could not recover network connection, running fallback")
+                logger.warn("LockscreenNotifications: Could not recover network connection, running fallback")
                 if fallback_callback then
                     fallback_callback()
                 elseif callback then
@@ -524,7 +524,7 @@ function WeatherUtils:safeGoOnlineToRun(callback, fallback_callback, suppress_ne
     -- goOnlineToRun returned without crash
     -- Check if it returned false (failed to connect) and callback wasn't invoked
     if go_online_result == false and not callback_invoked then
-        logger.dbg("WeatherLockscreen: goOnlineToRun returned false, connection failed")
+        logger.dbg("LockscreenNotifications: goOnlineToRun returned false, connection failed")
         restoreUIManager()
         if fallback_callback then
             fallback_callback()
@@ -541,7 +541,7 @@ function WeatherUtils:safeGoOnlineToRun(callback, fallback_callback, suppress_ne
         -- Schedule a timeout cleanup in case the callback is never called
         UIManager:scheduleIn(35, function()
             if not callback_invoked then
-                logger.warn("WeatherLockscreen: Network connection timed out (35s)")
+                logger.warn("LockscreenNotifications: Network connection timed out (35s)")
                 restoreUIManager()
                 if fallback_callback then
                     fallback_callback()
@@ -628,9 +628,9 @@ function WeatherUtils:suspendFrontlight(plugin_instance)
     if Device:hasFrontlight() and not plugin_instance.saved_frontlight_intensity then
         local Powerd = Device:getPowerDevice()
         plugin_instance.saved_frontlight_intensity = Powerd:frontlightIntensity()
-        logger.dbg("WeatherLockscreen: Saved frontlight intensity:", plugin_instance.saved_frontlight_intensity)
+        logger.dbg("LockscreenNotifications: Saved frontlight intensity:", plugin_instance.saved_frontlight_intensity)
         Powerd:setIntensity(0)
-        logger.dbg("WeatherLockscreen: Frontlight turned off")
+        logger.dbg("LockscreenNotifications: Frontlight turned off")
     end
 end
 
@@ -641,9 +641,9 @@ function WeatherUtils:resumeFrontlight(plugin_instance)
     if Device:hasFrontlight() and plugin_instance.saved_frontlight_intensity then
         local Powerd = Device:getPowerDevice()
         Powerd:setIntensity(plugin_instance.saved_frontlight_intensity)
-        logger.dbg("WeatherLockscreen: Restored frontlight intensity to:", plugin_instance.saved_frontlight_intensity)
+        logger.dbg("LockscreenNotifications: Restored frontlight intensity to:", plugin_instance.saved_frontlight_intensity)
         plugin_instance.saved_frontlight_intensity = nil
-        logger.dbg("WeatherLockscreen: Reset saved frontlight intensity")
+        logger.dbg("LockscreenNotifications: Reset saved frontlight intensity")
     end
 end
 
@@ -653,17 +653,17 @@ function WeatherUtils:toggleSuspend()
     local Powerd = Device:getPowerDevice()
     if Powerd and Powerd.toggleSuspend then
         Powerd:toggleSuspend()
-        logger.info("WeatherLockscreen: Suspend triggered via toggleSuspend()")
+        logger.info("LockscreenNotifications: Suspend triggered via toggleSuspend()")
         return
     end
 
     if Device and Device.suspend then
         Device:suspend()
-        logger.info("WeatherLockscreen: Suspend triggered via Device:suspend()")
+        logger.info("LockscreenNotifications: Suspend triggered via Device:suspend()")
         return
     end
 
-    logger.warn("WeatherLockscreen: Unable to suspend device (no toggleSuspend or suspend API)")
+    logger.warn("LockscreenNotifications: Unable to suspend device (no toggleSuspend or suspend API)")
 end
 
 function WeatherUtils:koLangAsWeatherAPILang()

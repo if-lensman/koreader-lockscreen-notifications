@@ -1,10 +1,10 @@
-# German translation for WeatherLockscreen
+# German translation for KOReader Lock Screen Notifications
 # Copyright (C) 2025 Andreas Lösel
-# This file is distributed under the same license as the WeatherLockscreen package.
+# This file is distributed under the same license as the KOReader Lock Screen Notifications package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: WeatherLockscreen\n"
+"Project-Id-Version: KOReader Lock Screen Notifications\n"
 "Last-Translator: Andreas Lösel\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -420,11 +420,14 @@ msgstr "Unverändert"
 msgid "Choose what to display when weather data is unavailable (no internet, API error, etc.). Image folders and other options are configured in KOReader's Sleep screen settings."
 msgstr "Wähle, was angezeigt werden soll, wenn Wetterdaten nicht verfügbar sind (kein Internet, API-Fehler, etc.). Bilderordner und andere Optionen werden in KOReaders Ruhebildschirm-Einstellungen konfiguriert."
 
-msgid "Weather & Notifications Lockscreen"
-msgstr "Wetter- und Benachrichtigungs-Ruhebildschirm"
+msgid "Lock Screen Notifications"
+msgstr "Sperrbildschirm-Benachrichtigungen"
 
-msgid "Displays weather or read-only notifications on the sleep screen."
-msgstr "Zeigt Wetter oder reine Benachrichtigungen auf dem Ruhebildschirm an."
+msgid "Displays a read-only notification feed on the KOReader sleep screen. Optional weather display is also included."
+msgstr "Zeigt einen schreibgeschützten Benachrichtigungsfeed auf dem KOReader-Ruhebildschirm an. Eine optionale Wetteranzeige ist ebenfalls enthalten."
+
+msgid "Weather display (optional)"
+msgstr "Wetteranzeige (optional)"
 
 msgid "Show notifications on sleep screen"
 msgstr "Benachrichtigungen auf dem Ruhebildschirm anzeigen"
@@ -435,8 +438,8 @@ msgstr "KI-BENACHRICHTIGUNGEN"
 msgid "%1 pending"
 msgstr "%1 ausstehend"
 
-msgid "Set the notification feed URL in Tools > Weather & Notifications Lockscreen."
-msgstr "Lege die URL des Benachrichtigungsfeeds unter Werkzeuge > Wetter- und Benachrichtigungs-Ruhebildschirm fest."
+msgid "Set the notification feed URL in Tools > Lock Screen Notifications."
+msgstr "Lege die URL des Benachrichtigungsfeeds unter Werkzeuge > Sperrbildschirm-Benachrichtigungen fest."
 
 msgid "No pending notifications."
 msgstr "Keine ausstehenden Benachrichtigungen."

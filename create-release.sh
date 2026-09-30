@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Script to create a release zip for weatherlockscreen.koplugin
+# Script to create a release zip for notificationslockscreen.koplugin
 
 VERSION=${1:-"dev"}
-OUTPUT_FILE="weatherlockscreen.koplugin-${VERSION}.zip"
+OUTPUT_FILE="notificationslockscreen.koplugin-${VERSION}.zip"
 
 echo "Creating release archive: $OUTPUT_FILE"
 
@@ -12,7 +12,7 @@ bash ./compile_translations.sh
 
 # Create temporary directory
 TEMP_DIR=$(mktemp -d)
-PLUGIN_DIR="$TEMP_DIR/weatherlockscreen.koplugin"
+PLUGIN_DIR="$TEMP_DIR/notificationslockscreen.koplugin"
 
 # Copy all files to temp directory
 mkdir -p "$PLUGIN_DIR"
@@ -30,7 +30,7 @@ rsync -av --exclude='.git' \
 
 # Create zip archive
 cd "$TEMP_DIR"
-zip -r "$OUTPUT_FILE" weatherlockscreen.koplugin/
+zip -r "$OUTPUT_FILE" notificationslockscreen.koplugin/
 
 # Move zip to original directory
 mv "$OUTPUT_FILE" "$OLDPWD/"

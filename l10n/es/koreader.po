@@ -1,10 +1,10 @@
-# Spanish translation for WeatherLockscreen
+# Spanish translation for KOReader Lock Screen Notifications
 # Copyright (C) 2025 Jeustin Bejarano
-# This file is distributed under the same license as the WeatherLockscreen package.
+# This file is distributed under the same license as the KOReader Lock Screen Notifications package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: WeatherLockscreen\n"
+"Project-Id-Version: KOReader Lock Screen Notifications\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jeustin Bejarano\n"
@@ -424,11 +424,14 @@ msgstr "Dejar como está"
 msgid "Choose what to display when weather data is unavailable (no internet, API error, etc.). Image folders and other options are configured in KOReader's Sleep screen settings."
 msgstr "Elige qué mostrar cuando los datos del clima no están disponibles (sin internet, error de API, etc.). Las carpetas de imágenes y otras opciones se configuran en los ajustes de pantalla de suspensión de KOReader."
 
-msgid "Weather & Notifications Lockscreen"
-msgstr "Pantalla de bloqueo del clima y las notificaciones"
+msgid "Lock Screen Notifications"
+msgstr "Notificaciones en pantalla de bloqueo"
 
-msgid "Displays weather or read-only notifications on the sleep screen."
-msgstr "Muestra el clima o notificaciones de solo lectura en la pantalla de suspensión."
+msgid "Displays a read-only notification feed on the KOReader sleep screen. Optional weather display is also included."
+msgstr "Muestra un canal de notificaciones de solo lectura en la pantalla de suspensión de KOReader. También incluye una vista opcional del clima."
+
+msgid "Weather display (optional)"
+msgstr "Vista del clima (opcional)"
 
 msgid "Show notifications on sleep screen"
 msgstr "Mostrar notificaciones en la pantalla de suspensión"
@@ -439,8 +442,8 @@ msgstr "NOTIFICACIONES DE IA"
 msgid "%1 pending"
 msgstr "%1 pendientes"
 
-msgid "Set the notification feed URL in Tools > Weather & Notifications Lockscreen."
-msgstr "Configura la URL del canal de notificaciones en Herramientas > Pantalla de bloqueo del clima y las notificaciones."
+msgid "Set the notification feed URL in Tools > Lock Screen Notifications."
+msgstr "Configura la URL del canal de notificaciones en Herramientas > Notificaciones en pantalla de bloqueo."
 
 msgid "No pending notifications."
 msgstr "No hay notificaciones pendientes."

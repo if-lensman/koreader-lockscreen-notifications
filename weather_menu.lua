@@ -60,7 +60,6 @@ end
 
 function WeatherMenu:getSubMenuItems(plugin_instance)
     local menu_items = {
-        withGlyph(self:getNotificationFeedMenuItem(plugin_instance), ICON.database),
         withGlyph(self:getLocationMenuItem(plugin_instance), ICON.map_marker),
         withGlyph(self:getDisplayStyleMenuItem(plugin_instance), ICON.palette),
         withGlyph(self:getTemperatureScaleMenuItem(plugin_instance), ICON.thermometer),
@@ -92,6 +91,13 @@ function WeatherMenu:getSubMenuItems(plugin_instance)
     table.insert(menu_items, withGlyph(self:getDashboardModeMenuItem(plugin_instance), ICON.view_dashboard))
 
     return menu_items
+end
+
+function WeatherMenu:getNotificationSubMenuItems(plugin_instance)
+    return {
+        withGlyph(self:getNotificationFeedMenuItem(plugin_instance), ICON.database),
+        withGlyph(self:getRtcModeMenuItem(plugin_instance), ICON.sleep),
+    }
 end
 
 function WeatherMenu:getNotificationFeedMenuItem(plugin_instance)
@@ -264,7 +270,7 @@ function WeatherMenu:showLocationPicker(plugin_instance, touchmenu_instance, loc
                     G_reader_settings:saveSetting("weather_location_name", location_name)
                     G_reader_settings:flush()
                     plugin_instance.refresh = true
-                    logger.dbg("WeatherLockscreen: Saved location:", location_value, "as", location_name)
+                    logger.dbg("LockscreenNotifications: Saved location:", location_value, "as", location_name)
 
                     if touchmenu_instance then
                         touchmenu_instance:updateItems()
@@ -353,7 +359,7 @@ function WeatherMenu:getDisplayStyleOption(plugin_instance, style_value, style_l
         callback = function(touchmenu_instance)
             G_reader_settings:saveSetting("weather_display_style", style_value)
             G_reader_settings:flush()
-            logger.dbg("WeatherLockscreen: Saved display style:", style_value)
+            logger.dbg("LockscreenNotifications: Saved display style:", style_value)
             -- Rebuild this submenu so the Forecast hours item appears/disappears
             -- for the newly selected mode straight away.
             touchmenu_instance.item_table = WeatherMenu:getDisplayStyleSubItems(plugin_instance)
@@ -416,7 +422,7 @@ function WeatherMenu:getOrientationOption(plugin_instance, mode_value, mode_labe
         callback = function(touchmenu_instance)
             G_reader_settings:saveSetting("weather_orientation", mode_value)
             G_reader_settings:flush()
-            logger.dbg("WeatherLockscreen: Saved orientation rotation mode:", mode_value)
+            logger.dbg("LockscreenNotifications: Saved orientation rotation mode:", mode_value)
             touchmenu_instance:updateItems()
         end,
         radio = true,
@@ -441,7 +447,7 @@ function WeatherMenu:getTemperatureScaleMenuItem(plugin_instance)
                 callback = function(touchmenu_instance)
                     G_reader_settings:saveSetting("weather_temp_scale", "C")
                     G_reader_settings:flush()
-                    logger.dbg("WeatherLockscreen: Saved temp scale: C")
+                    logger.dbg("LockscreenNotifications: Saved temp scale: C")
                     touchmenu_instance:updateItems()
                 end,
                 radio = true,
@@ -457,7 +463,7 @@ function WeatherMenu:getTemperatureScaleMenuItem(plugin_instance)
                 callback = function(touchmenu_instance)
                     G_reader_settings:saveSetting("weather_temp_scale", "F")
                     G_reader_settings:flush()
-                    logger.dbg("WeatherLockscreen: Saved temp scale: F")
+                    logger.dbg("LockscreenNotifications: Saved temp scale: F")
                     touchmenu_instance:updateItems()
                 end,
                 radio = true,
@@ -599,7 +605,7 @@ function WeatherMenu:getCoverScalingMenuItem()
                 callback = function(touchmenu_instance)
                     G_reader_settings:saveSetting("weather_cover_scaling", "fit")
                     G_reader_settings:flush()
-                    logger.dbg("WeatherLockscreen: Saved cover scaling: fit")
+                    logger.dbg("LockscreenNotifications: Saved cover scaling: fit")
                     touchmenu_instance:updateItems()
                 end,
                 radio = true,
@@ -614,7 +620,7 @@ function WeatherMenu:getCoverScalingMenuItem()
                 callback = function(touchmenu_instance)
                     G_reader_settings:saveSetting("weather_cover_scaling", "zoom")
                     G_reader_settings:flush()
-                    logger.dbg("WeatherLockscreen: Saved cover scaling: zoom")
+                    logger.dbg("LockscreenNotifications: Saved cover scaling: zoom")
                     touchmenu_instance:updateItems()
                 end,
                 radio = true,
@@ -629,7 +635,7 @@ function WeatherMenu:getCoverScalingMenuItem()
                 callback = function(touchmenu_instance)
                     G_reader_settings:saveSetting("weather_cover_scaling", "stretch")
                     G_reader_settings:flush()
-                    logger.dbg("WeatherLockscreen: Saved cover scaling: stretch")
+                    logger.dbg("LockscreenNotifications: Saved cover scaling: stretch")
                     touchmenu_instance:updateItems()
                 end,
                 radio = true,

@@ -1,5 +1,5 @@
 --[[
-    Custom gettext implementation for WeatherLockscreen plugin
+    Custom gettext implementation for KOReader Lock Screen Notifications
     Adapted from ProjectTitle plugin by joshuacant
 
     This module wraps KOReader's gettext to load plugin-specific translations
@@ -53,7 +53,7 @@ local changeLang = function(new_lang)
             end
         end
     else
-        logger.dbg("WeatherLockscreen: Failed to load translation for lang", new_lang, "error:", err)
+        logger.dbg("LockscreenNotifications: Failed to load translation for lang", new_lang, "error:", err)
     end
 
     -- Restore original KOReader gettext state
@@ -70,7 +70,7 @@ end
 local function createGetTextProxy(new_gettext, gettext)
     -- Verify that plugin translation loaded successfully
     if not (new_gettext.wrapUntranslated and new_gettext.translation and new_gettext.current_lang) then
-        logger.dbg("WeatherLockscreen: Plugin translation not loaded, using KOReader defaults for lang", gettext.current_lang)
+        logger.dbg("LockscreenNotifications: Plugin translation not loaded, using KOReader defaults for lang", gettext.current_lang)
         return gettext
     end
 
@@ -129,7 +129,7 @@ local function createGetTextProxy(new_gettext, gettext)
             local new_lang = new_gettext.current_lang
             local dump_path = string.format("%s/%s/%s", new_gettext.dirname, new_lang, "debug_logs.lua")
             require("luasettings"):open(dump_path):saveSetting("po", new_gettext):flush()
-            logger.info("WeatherLockscreen: Translation debug dump saved to", dump_path)
+            logger.info("LockscreenNotifications: Translation debug dump saved to", dump_path)
         end
     }, mt)
 end

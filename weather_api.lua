@@ -52,9 +52,9 @@ function WeatherAPI:fetchWeatherData(weather_lockscreen)
 
     local lang = WeatherUtils:koLangAsWeatherAPILang()
 
-    logger.dbg("WeatherLockscreen: Using location:", location)
-    logger.dbg("WeatherLockscreen: Using API key:", api_key and (api_key:sub(1, 8) .. "...") or "none")
-    logger.dbg("WeatherLockscreen: Using language:", lang)
+    logger.dbg("LockscreenNotifications: Using location:", location)
+    logger.dbg("LockscreenNotifications: Using API key:", api_key and (api_key:sub(1, 8) .. "...") or "none")
+    logger.dbg("LockscreenNotifications: Using language:", lang)
 
     -- Instant cache-first render (e.g. active-sleep RTC wake): return the last
     -- cached data and never touch the network, so the weather shows immediately
@@ -62,7 +62,7 @@ function WeatherAPI:fetchWeatherData(weather_lockscreen)
     -- the fetch that follows, and stale weather (marked with *) still beats
     -- falling back to the cover.
     if weather_lockscreen.prefer_cache then
-        logger.dbg("WeatherLockscreen: prefer_cache set, returning cached data without network")
+        logger.dbg("LockscreenNotifications: prefer_cache set, returning cached data without network")
         local cached_data = WeatherUtils:loadWeatherCache(math.huge)
         if cached_data then
             cached_data.is_cached = true
@@ -73,14 +73,14 @@ function WeatherAPI:fetchWeatherData(weather_lockscreen)
     if not refresh_required then
         local cached_data = WeatherUtils:loadWeatherCache(WeatherUtils:getMinDelayBetweenUpdates())
         if cached_data and lang == cached_data.lang then
-            logger.dbg("WeatherLockscreen: Using cache to avoid repeated requests")
+            logger.dbg("LockscreenNotifications: Using cache to avoid repeated requests")
             cached_data.is_cached = true
             return cached_data
         end
     end
 
     if not api_key or api_key == "" then
-        logger.warn("WeatherLockscreen: No API key configured")
+        logger.warn("LockscreenNotifications: No API key configured")
         local cached_data = WeatherUtils:loadWeatherCache(WeatherUtils:getCacheMaxAge())
         if cached_data then
             cached_data.is_cached = true
@@ -98,13 +98,13 @@ function WeatherAPI:fetchWeatherData(weather_lockscreen)
         lang
     )
 
-    logger.dbg("WeatherLockscreen: Fetching weather from API")
-    logger.dbg("WeatherLockscreen:", url)
+    logger.dbg("LockscreenNotifications: Fetching weather from API")
+    logger.dbg("LockscreenNotifications:", url)
 
     local sink_table = {}
     local code, err = http_request_code(url, sink_table)
     if not code then
-        logger.warn("WeatherLockscreen: HTTP request failed:", err or "unknown error")
+        logger.warn("LockscreenNotifications: HTTP request failed:", err or "unknown error")
         local cached_data = WeatherUtils:loadWeatherCache(WeatherUtils:getCacheMaxAge())
         if cached_data then
             cached_data.is_cached = true
@@ -117,17 +117,17 @@ function WeatherAPI:fetchWeatherData(weather_lockscreen)
         local success, result = pcall(json.decode, response_data)
 
         if success and result and result.current and not result.error then
-            logger.dbg("WeatherLockscreen: Weather data received successfully")
+            logger.dbg("LockscreenNotifications: Weather data received successfully")
             local weather_data = self:processWeatherData(result)
             WeatherUtils:saveWeatherCache(weather_data)
             weather_data.is_cached = false
             weather_lockscreen.refresh = false
             return weather_data
         else
-            logger.warn("WeatherLockscreen: Failed to parse weather data")
+            logger.warn("LockscreenNotifications: Failed to parse weather data")
         end
     else
-        logger.warn("WeatherLockscreen: Failed to fetch weather, HTTP code:", code)
+        logger.warn("LockscreenNotifications: Failed to fetch weather, HTTP code:", code)
     end
 
     -- Try cache if fetch failed
@@ -278,12 +278,12 @@ function WeatherAPI:searchLocations(query, api_key)
         urlEncode(query)
     )
 
-    logger.dbg("WeatherLockscreen: Searching locations with query:", query)
+    logger.dbg("LockscreenNotifications: Searching locations with query:", query)
 
     local sink_table = {}
     local code, err = http_request_code(url, sink_table)
     if not code then
-        logger.warn("WeatherLockscreen: Location search HTTP request failed:", err or "unknown error")
+        logger.warn("LockscreenNotifications: Location search HTTP request failed:", err or "unknown error")
         return nil, _("API error") .. " (" .. (err or "unknown") .. ")"
     end
 
@@ -295,10 +295,10 @@ function WeatherAPI:searchLocations(query, api_key)
             if #result == 0 then
                 return nil, _("No location found")
             end
-            logger.dbg("WeatherLockscreen: Found", #result, "locations")
+            logger.dbg("LockscreenNotifications: Found", #result, "locations")
             return result
         else
-            logger.warn("WeatherLockscreen: Failed to parse location search response")
+            logger.warn("LockscreenNotifications: Failed to parse location search response")
             return nil, _("Failed to parse response")
         end
     elseif code == 400 then
@@ -310,7 +310,7 @@ function WeatherAPI:searchLocations(query, api_key)
         end
         return nil, _("No location found")
     else
-        logger.warn("WeatherLockscreen: Location search failed, HTTP code:", code)
+        logger.warn("LockscreenNotifications: Location search failed, HTTP code:", code)
         return nil, _("API error") .. " (" .. code .. ")"
     end
 end
@@ -349,14 +349,14 @@ function WeatherAPI:getIconPath(icon_url_from_api)
     end
 
     -- Download the icon
-    logger.dbg("WeatherLockscreen: Downloading icon from:", url)
+    logger.dbg("LockscreenNotifications: Downloading icon from:", url)
 
     util.makePath(cache_dir)
 
     local sink_table = {}
     local code, err = http_request_code(url, sink_table)
     if not code then
-        logger.dbg("WeatherLockscreen: Icon download failed:", err or "unknown error")
+        logger.dbg("LockscreenNotifications: Icon download failed:", err or "unknown error")
         return nil
     end
 

@@ -1,7 +1,7 @@
 --[[
-    Weather Lockscreen Plugin for KOReader
+    KOReader Lock Screen Notifications Plugin
 
-    Displays weather information on the sleep screen.
+    Displays a read-only notification feed on the sleep screen; weather is optional.
 
     Author: Andreas Lösel
     License: GNU AGPL v3
@@ -24,8 +24,8 @@ local WeatherMenu = require("weather_menu")
 local WeatherDashboard = require("weather_dashboard")
 local DisplayHelper = require("display_helper")
 
-local WeatherLockscreen = WidgetContainer:extend {
-    name = "weatherlockscreen",
+local LockscreenNotifications = WidgetContainer:extend {
+    name = "notificationslockscreen",
     default_location = "London",
     default_api_key = "637e03f814b440f782675255250411",
     default_temp_scale = "C",
@@ -59,7 +59,7 @@ local WeatherLockscreen = WidgetContainer:extend {
     dashboard_widget = nil,
 }
 
-function WeatherLockscreen:onDispatcherRegisterActions()
+function LockscreenNotifications:onDispatcherRegisterActions()
     Dispatcher:registerAction("weather_dashboard_toggle", {
         category = "none",
         event = "ToggleWeatherDashboard",
@@ -76,7 +76,7 @@ end
 
 -- Initialize default settings if not already set
 -- This ensures the plugin works correctly on first run
-function WeatherLockscreen:initDefaultSettings()
+function LockscreenNotifications:initDefaultSettings()
     local defaults = {
         -- Core settings
         weather_location = self.default_location,
@@ -119,17 +119,17 @@ function WeatherLockscreen:initDefaultSettings()
         if G_reader_settings:readSetting(setting) == nil then
             G_reader_settings:saveSetting(setting, default_value)
             settings_changed = true
-            logger.dbg("WeatherLockscreen: Initialized setting", setting, "to", default_value)
+            logger.dbg("LockscreenNotifications: Initialized setting", setting, "to", default_value)
         end
     end
 
     if settings_changed then
         G_reader_settings:flush()
-        logger.info("WeatherLockscreen: Default settings initialized")
+        logger.info("LockscreenNotifications: Default settings initialized")
     end
 end
 
-function WeatherLockscreen:init()
+function LockscreenNotifications:init()
     self:initDefaultSettings()
     self:onDispatcherRegisterActions()
     WeatherUtils:installIcons()
@@ -145,14 +145,14 @@ function WeatherLockscreen:init()
         -- Otherwise create our own
         if Device.wakeup_mgr then
             self.wakeup_mgr = Device.wakeup_mgr
-            logger.dbg("WeatherLockscreen: Using device WakeupMgr")
+            logger.dbg("LockscreenNotifications: Using device WakeupMgr")
         end
     else
-        logger.info("WeatherLockscreen: RTC wakeup not available, dashboard mode available for all devices")
+        logger.info("LockscreenNotifications: RTC wakeup not available, dashboard mode available for all devices")
     end
 
     self.rtcRefreshCallback = function()
-        logger.info("WeatherLockscreen: RTC periodic refresh triggered")
+        logger.info("LockscreenNotifications: RTC periodic refresh triggered")
         -- Must be set on the instance: a successful fetch clears the instance
         -- field, which would shadow a class-level write on every later read.
         self.refresh = true
@@ -170,7 +170,7 @@ function WeatherLockscreen:init()
                 if Device.screen_saver_mode and (ss_type == "weather" or ss_type == "notifications") then
                     Screensaver:show()
                 else
-                    logger.info("WeatherLockscreen: Skipping screensaver redraw on scheduled wakeup")
+                    logger.info("LockscreenNotifications: Skipping screensaver redraw on scheduled wakeup")
                 end
             end)
         else -- Device is Kindle
@@ -194,7 +194,7 @@ function WeatherLockscreen:init()
             self:exitChargingRefresh()
             return
         end
-        logger.info("WeatherLockscreen: Charging-refresh timer fired")
+        logger.info("LockscreenNotifications: Charging-refresh timer fired")
         self.refresh = true
         self.active_sleep_refresh = true
         require("ui/screensaver"):show()
@@ -202,8 +202,8 @@ function WeatherLockscreen:init()
     end
 end
 
-function WeatherLockscreen:onToggleWeatherDashboard()
-    logger.info("WeatherLockscreen: Dashboard toggle triggered")
+function LockscreenNotifications:onToggleWeatherDashboard()
+    logger.info("LockscreenNotifications: Dashboard toggle triggered")
     if self.dashboard_mode_enabled then
         WeatherDashboard:stop(self)
     else
@@ -212,8 +212,8 @@ function WeatherLockscreen:onToggleWeatherDashboard()
     return true
 end
 
-function WeatherLockscreen:onClearWeatherCache()
-    logger.info("WeatherLockscreen: Clear cache triggered")
+function LockscreenNotifications:onClearWeatherCache()
+    logger.info("LockscreenNotifications: Clear cache triggered")
     local InfoMessage = require("ui/widget/infomessage")
 
     if WeatherUtils:clearCache() then
@@ -230,9 +230,16 @@ function WeatherLockscreen:onClearWeatherCache()
     return true
 end
 
-function WeatherLockscreen:addToMainMenu(menu_items)
+function LockscreenNotifications:addToMainMenu(menu_items)
+    menu_items.notification_lockscreen = {
+        text = _("Lock Screen Notifications"),
+        sub_item_table_func = function()
+            return WeatherMenu:getNotificationSubMenuItems(self)
+        end,
+        sorting_hint = "tools",
+    }
     menu_items.weather_lockscreen = {
-        text = _("Weather & Notifications Lockscreen"),
+        text = _("Weather display (optional)"),
         sub_item_table_func = function()
             return WeatherMenu:getSubMenuItems(self)
         end,
@@ -240,7 +247,7 @@ function WeatherLockscreen:addToMainMenu(menu_items)
     }
 end
 
-function WeatherLockscreen:setPeriodicRefreshInterval(interval, type, touchmenu_instance, charging)
+function LockscreenNotifications:setPeriodicRefreshInterval(interval, type, touchmenu_instance, charging)
     local setting_key
     if charging then
         setting_key = type == "rtc"
@@ -280,7 +287,7 @@ function WeatherLockscreen:setPeriodicRefreshInterval(interval, type, touchmenu_
     end
 end
 
-function WeatherLockscreen:patchScreensaver()
+function LockscreenNotifications:patchScreensaver()
     -- Store reference to self for use in closures
     local plugin_instance = self
 
@@ -288,15 +295,15 @@ function WeatherLockscreen:patchScreensaver()
     local Screensaver = require("ui/screensaver")
 
     -- Save original show method if not already saved
-    if not Screensaver._orig_show_before_weather then
-        Screensaver._orig_show_before_weather = Screensaver.show
+    if not Screensaver._orig_show_before_notifications then
+        Screensaver._orig_show_before_notifications = Screensaver.show
     end
 
     Screensaver.show = function(screensaver_instance)
         local ss_type = G_reader_settings:readSetting("screensaver_type")
         if ss_type == "weather" or ss_type == "notifications" then
             screensaver_instance.screensaver_type = ss_type
-            logger.dbg("WeatherLockscreen: Managed screensaver activated:", ss_type)
+            logger.dbg("LockscreenNotifications: Managed screensaver activated:", ss_type)
 
             -- Schedule periodic refresh when screen locks (RTC on battery, or a
             -- standby timer while charging since the device won't deep-suspend).
@@ -329,13 +336,13 @@ function WeatherLockscreen:patchScreensaver()
                 screensaver_instance.hourglass_widget = DisplayHelper:createLoadingWidget()
                 if screensaver_instance.hourglass_widget then
                     UIManager:show(screensaver_instance.hourglass_widget, "full")
-                    logger.dbg("WeatherLockscreen: Loading widget displayed")
+                    logger.dbg("LockscreenNotifications: Loading widget displayed")
                 end
             end
 
             -- Define function to create and show weather widget
             local function screensaverShow()
-                logger.dbg("WeatherLockscreen: Creating widget")
+                logger.dbg("LockscreenNotifications: Creating widget")
                 local weather_widget = plugin_instance:createScreensaverWidget(ss_type)
 
                 -- The screensaver widget currently on screen, if any (ours or a
@@ -352,12 +359,12 @@ function WeatherLockscreen:patchScreensaver()
                     if screensaver_instance.hourglass_widget then
                         UIManager:close(screensaver_instance.hourglass_widget)
                         screensaver_instance.hourglass_widget = nil
-                        logger.dbg("WeatherLockscreen: Loading widget closed")
+                        logger.dbg("LockscreenNotifications: Loading widget closed")
                     end
                 end
 
                 if weather_widget then
-                    logger.dbg("WeatherLockscreen: Weather widget created successfully")
+                    logger.dbg("LockscreenNotifications: Weather widget created successfully")
                     local bg_color = Blitbuffer.COLOR_WHITE
                     local display_style = G_reader_settings:readSetting("weather_display_style") or "default"
                     if ss_type == "weather" and display_style == "nightowl" then
@@ -378,7 +385,7 @@ function WeatherLockscreen:patchScreensaver()
                         on_screen.widget = weather_widget
                         plugin_instance.weather_screensaver_widget = on_screen
                         UIManager:setDirty(on_screen, "full")
-                        logger.dbg("WeatherLockscreen: Widget refreshed in place")
+                        logger.dbg("LockscreenNotifications: Widget refreshed in place")
                     else
                         local new_widget = ScreenSaverWidget:new {
                             widget = weather_widget,
@@ -391,7 +398,7 @@ function WeatherLockscreen:patchScreensaver()
                         plugin_instance.weather_screensaver_widget = new_widget
 
                         UIManager:show(new_widget, "full")
-                        logger.dbg("WeatherLockscreen: Widget displayed")
+                        logger.dbg("LockscreenNotifications: Widget displayed")
                     end
 
                     -- Close the loading widget (only shown on the initial show)
@@ -404,7 +411,7 @@ function WeatherLockscreen:patchScreensaver()
                     -- every failed refresh without ever closing the previous
                     -- one, stacking them up for the user to dismiss.
                     closeLoadingWidget()
-                    logger.warn("WeatherLockscreen: No weather data on refresh, keeping current display")
+                    logger.warn("LockscreenNotifications: No weather data on refresh, keeping current display")
                 else
                     -- Close the loading widget before falling back
                     closeLoadingWidget()
@@ -413,7 +420,7 @@ function WeatherLockscreen:patchScreensaver()
 
                     -- Use configured fallback screensaver type
                     local fallback_type = G_reader_settings:readSetting("weather_fallback_type") or "cover"
-                    logger.warn("WeatherLockscreen: No weather data, using fallback:", fallback_type)
+                    logger.warn("LockscreenNotifications: No weather data, using fallback:", fallback_type)
 
                     -- Reset state we've already set up so original screensaver can set it properly
                     Device.screen_saver_mode = false
@@ -427,7 +434,7 @@ function WeatherLockscreen:patchScreensaver()
 
                     -- Let KOReader's screensaver handle setup and display
                     Screensaver:setup()
-                    Screensaver._orig_show_before_weather(screensaver_instance)
+                    Screensaver._orig_show_before_notifications(screensaver_instance)
 
                     -- Restore weather as the screensaver type (don't flush to disk)
                     G_reader_settings:saveSetting("screensaver_type", ss_type)
@@ -436,45 +443,45 @@ function WeatherLockscreen:patchScreensaver()
             -- Create weather widget
             if WeatherUtils:wifiEnableActionTurnOn() and not plugin_instance.prefer_cache then
                 -- TODO: See if we want to use the cache before turning on the wifi (needs refactoring)
-                logger.dbg("WeatherLockscreen: Creating widget (will wait for network if needed)")
+                logger.dbg("LockscreenNotifications: Creating widget (will wait for network if needed)")
 
                 -- Use safe wrapper to go online with proper error handling
                 WeatherUtils:safeGoOnlineToRun(
                     function()
-                        logger.dbg("WeatherLockscreen: Network is online, showing screensaver")
+                        logger.dbg("LockscreenNotifications: Network is online, showing screensaver")
                         screensaverShow()
                     end,
                     function()
                         -- Fallback: show screensaver anyway with potentially cached data
-                        logger.dbg("WeatherLockscreen: Network connection failed, showing screensaver with cached data")
+                        logger.dbg("LockscreenNotifications: Network connection failed, showing screensaver with cached data")
                         screensaverShow()
                     end,
                     true -- suppress network messages
                 )
             else
-                logger.dbg("WeatherLockscreen: Creating widget (will not wait for network)")
+                logger.dbg("LockscreenNotifications: Creating widget (will not wait for network)")
                 screensaverShow()
             end
         else
-            logger.dbg("WeatherLockscreen: Non-weather screensaver activated, calling original show")
-            Screensaver._orig_show_before_weather(screensaver_instance)
+            logger.dbg("LockscreenNotifications: Non-weather screensaver activated, calling original show")
+            Screensaver._orig_show_before_notifications(screensaver_instance)
         end
     end
 end
 
-function WeatherLockscreen:patchDofile()
+function LockscreenNotifications:patchDofile()
     -- Patch the screensaver menu to add weather option
     -- We need to override dofile to inject our menu item
-    if not _G._orig_dofile_before_weather then
+    if not _G._orig_dofile_before_notifications then
         local orig_dofile = dofile
-        _G._orig_dofile_before_weather = orig_dofile
+        _G._orig_dofile_before_notifications = orig_dofile
 
         _G.dofile = function(filepath)
             local result = orig_dofile(filepath)
 
             -- Check if this is the screensaver menu being loaded
             if filepath and filepath:match("screensaver_menu%.lua$") then
-                logger.dbg("WeatherLockscreen: Patching screensaver menu")
+                logger.dbg("LockscreenNotifications: Patching screensaver menu")
 
                 if result and result[1] and result[1].sub_item_table then
                     local wallpaper_submenu = result[1].sub_item_table
@@ -494,20 +501,19 @@ function WeatherLockscreen:patchDofile()
                         }
                     end
 
-                    -- Add weather option
-                    local weather_item = genMenuItem(_("Show weather on sleep screen"), "screensaver_type", "weather")
                     local notification_item = genMenuItem(_("Show notifications on sleep screen"), "screensaver_type", "notifications")
+                    local weather_item = genMenuItem(_("Show weather on sleep screen"), "screensaver_type", "weather")
 
-                    -- Insert before "Leave screen as-is" option (position 6)
-                    table.insert(wallpaper_submenu, 6, weather_item)
-                    table.insert(wallpaper_submenu, 7, notification_item)
+                    -- Put the notification canvas first; retain weather as an optional mode.
+                    table.insert(wallpaper_submenu, 6, notification_item)
+                    table.insert(wallpaper_submenu, 7, weather_item)
 
-                    logger.dbg("WeatherLockscreen: Added weather option to screensaver menu")
+                    logger.dbg("LockscreenNotifications: Added weather option to screensaver menu")
                 end
 
                 -- Restore original dofile after patching
                 _G.dofile = orig_dofile
-                _G._orig_dofile_before_weather = nil
+                _G._orig_dofile_before_notifications = nil
             end
 
             return result
@@ -515,12 +521,12 @@ function WeatherLockscreen:patchDofile()
     end
 end
 
-function WeatherLockscreen:createWeatherWidget()
-    logger.dbg("WeatherLockscreen: Creating widget")
+function LockscreenNotifications:createWeatherWidget()
+    logger.dbg("LockscreenNotifications: Creating widget")
     local weather_data = WeatherAPI:fetchWeatherData(self)
 
     if not weather_data or not weather_data.current or not weather_data.current.icon_path then
-        logger.warn("WeatherLockscreen: No weather data available, using fallback")
+        logger.warn("LockscreenNotifications: No weather data available, using fallback")
         return nil, true -- Signal to use fallback screensaver
     end
 
@@ -531,7 +537,7 @@ function WeatherLockscreen:createWeatherWidget()
 
     -- Check display style setting
     local display_style = G_reader_settings:readSetting("weather_display_style") or "default"
-    logger.dbg("WeatherLockscreen: Using display style: " .. display_style)
+    logger.dbg("LockscreenNotifications: Using display style: " .. display_style)
 
     -- Load appropriate display module
     local display_modules = {
@@ -546,14 +552,14 @@ function WeatherLockscreen:createWeatherWidget()
     return display_module:create(self, weather_data), false
 end
 
-function WeatherLockscreen:createScreensaverWidget(screensaver_type)
+function LockscreenNotifications:createScreensaverWidget(screensaver_type)
     if screensaver_type ~= "notifications" then
         return self:createWeatherWidget()
     end
 
     local notification_data = NotificationAPI:fetchNotificationData(self)
     if not notification_data then
-        logger.warn("WeatherLockscreen: No notification data available, using fallback")
+        logger.warn("LockscreenNotifications: No notification data available, using fallback")
         return nil, true
     end
 
@@ -564,7 +570,7 @@ end
 -- Choose the refresh mechanism based on power state. On external power the
 -- device won't deep-suspend (Kindle), so RTC wakes never fire; refresh via a
 -- UI timer instead. On battery we use RTC active sleep.
-function WeatherLockscreen:scheduleRefresh()
+function LockscreenNotifications:scheduleRefresh()
     -- The effective interval falls back to the base one when no charging
     -- override is set, so plugging in never silently disables the refresh.
     -- The Wi-Fi gate mirrors schedulePeriodicRefresh.
@@ -584,37 +590,37 @@ function WeatherLockscreen:scheduleRefresh()
 end
 
 -- (Re)arm the standby refresh timer for the charging interval.
-function WeatherLockscreen:armChargingTimer()
+function LockscreenNotifications:armChargingTimer()
     UIManager:unschedule(self.chargingRefreshCallback)
     local interval = WeatherUtils:getEffectiveRefreshInterval("rtc")
     if interval <= 0 then return end
-    logger.dbg("WeatherLockscreen: Arming charging-refresh timer in", interval, "seconds")
+    logger.dbg("LockscreenNotifications: Arming charging-refresh timer in", interval, "seconds")
     UIManager:scheduleIn(interval, self.chargingRefreshCallback)
 end
 
 -- Enter charging-refresh mode: prevent deep suspend (but leave standby allowed,
 -- for low power) and arm the refresh timer.
-function WeatherLockscreen:enterChargingRefresh()
+function LockscreenNotifications:enterChargingRefresh()
     if not self.charging_refresh_active then
         self.charging_refresh_active = true
         local PluginShare = require("pluginshare")
         PluginShare.pause_auto_suspend = true
-        logger.info("WeatherLockscreen: Entered charging-refresh mode (deep suspend paused, standby allowed)")
+        logger.info("LockscreenNotifications: Entered charging-refresh mode (deep suspend paused, standby allowed)")
     end
     self:armChargingTimer()
 end
 
 -- Leave charging-refresh mode: drop the timer and re-allow deep suspend.
-function WeatherLockscreen:exitChargingRefresh()
+function LockscreenNotifications:exitChargingRefresh()
     if not self.charging_refresh_active then return end
     self.charging_refresh_active = false
     UIManager:unschedule(self.chargingRefreshCallback)
     local PluginShare = require("pluginshare")
     PluginShare.pause_auto_suspend = false
-    logger.info("WeatherLockscreen: Exited charging-refresh mode")
+    logger.info("LockscreenNotifications: Exited charging-refresh mode")
 end
 
-function WeatherLockscreen:schedulePeriodicRefresh()
+function LockscreenNotifications:schedulePeriodicRefresh()
     -- Cancel any existing RTC wakeup
     if self.rtc_wakeup_scheduled and self.wakeup_mgr then
         self.wakeup_mgr:removeTasks(nil, self.rtcRefreshCallback)
@@ -622,17 +628,17 @@ function WeatherLockscreen:schedulePeriodicRefresh()
     end
 
     local interval = WeatherUtils:getEffectiveRefreshInterval("rtc")
-    logger.info("WeatherLockscreen: RTC interval base=", WeatherUtils:getPeriodicRefreshInterval("rtc"),
+    logger.info("LockscreenNotifications: RTC interval base=", WeatherUtils:getPeriodicRefreshInterval("rtc"),
         "charging_override=", WeatherUtils:getChargingRefreshInterval("rtc"),
         "on_power=", WeatherUtils:isOnExternalPower(), "-> effective=", interval)
     if interval == 0 then
-        logger.dbg("WeatherLockscreen: Periodic refresh disabled")
+        logger.dbg("LockscreenNotifications: Periodic refresh disabled")
         return
     end
 
     local wifi_turn_on = WeatherUtils:wifiEnableActionTurnOn()
     if wifi_turn_on == false then
-        logger.dbg("WeatherLockscreen: Periodic refresh disabled due to Wi-Fi action setting")
+        logger.dbg("LockscreenNotifications: Periodic refresh disabled due to Wi-Fi action setting")
         return
     end
 
@@ -640,38 +646,38 @@ function WeatherLockscreen:schedulePeriodicRefresh()
     if min_batt > 0 then
         local capacity = WeatherUtils:getBatteryCapacity()
         if capacity and capacity < min_batt then
-            logger.info("WeatherLockscreen: Periodic refresh disabled due to low battery (", capacity, "<", min_batt, ")")
+            logger.info("LockscreenNotifications: Periodic refresh disabled due to low battery (", capacity, "<", min_batt, ")")
             return
         end
     end
 
     -- Try RTC scheduling if WakeupMgr is available
     if self.wakeup_mgr then
-        logger.info("WeatherLockscreen: Scheduling RTC-based periodic refresh every", interval, "seconds")
+        logger.info("LockscreenNotifications: Scheduling RTC-based periodic refresh every", interval, "seconds")
 
         -- Add task to WakeupMgr queue
         -- On Kindle, this will be picked up by powerd during ReadyToSuspend
         self.wakeup_mgr:addTask(interval, self.rtcRefreshCallback)
         self.rtc_wakeup_scheduled = true
     else
-        logger.warn("WeatherLockscreen: WakeupMgr not available")
+        logger.warn("LockscreenNotifications: WakeupMgr not available")
     end
 end
 
 -- Re-evaluate the charging-aware refresh interval when the power state changes
 -- (e.g. the user plugs in after locking). Without this, a new interval would
 -- only take effect at the next scheduled wake.
-function WeatherLockscreen:onPowerStateChanged()
+function LockscreenNotifications:onPowerStateChanged()
     -- Active Sleep: re-pick the refresh mechanism if the weather screensaver is
     -- active (RTC on battery, standby timer while charging).
     local screensaver_type = G_reader_settings:readSetting("screensaver_type")
     if Device.screen_saver_mode and (screensaver_type == "weather" or screensaver_type == "notifications") then
-        logger.dbg("WeatherLockscreen: Power state changed, re-evaluating refresh mechanism")
+        logger.dbg("LockscreenNotifications: Power state changed, re-evaluating refresh mechanism")
         self:scheduleRefresh()
     end
     -- Dashboard: reschedule the next refresh to the new interval.
     if self.dashboard_mode_enabled then
-        logger.dbg("WeatherLockscreen: Power state changed, rescheduling dashboard refresh")
+        logger.dbg("LockscreenNotifications: Power state changed, rescheduling dashboard refresh")
         if self.dashboard_refresh_task then
             UIManager:unschedule(self.dashboard_refresh_task)
         end
@@ -679,16 +685,16 @@ function WeatherLockscreen:onPowerStateChanged()
     end
 end
 
-function WeatherLockscreen:onCharging()
+function LockscreenNotifications:onCharging()
     self:onPowerStateChanged()
 end
 
-function WeatherLockscreen:onNotCharging()
+function LockscreenNotifications:onNotCharging()
     self:onPowerStateChanged()
 end
 
-function WeatherLockscreen:onSuspend()
-    logger.dbg("WeatherLockscreen: Device suspending")
+function LockscreenNotifications:onSuspend()
+    logger.dbg("LockscreenNotifications: Device suspending")
 
     -- Let dashboard handle suspend if active
     if not WeatherDashboard:onSuspend(self) then
@@ -702,20 +708,20 @@ end
 -- even for widgets no longer on the window stack, and re-running
 -- ScreenSaverWidget:onCloseWidget on a dead widget would clobber the rotation
 -- and Device.screen_saver_mode a second time.
-function WeatherLockscreen:closeWeatherScreensaver()
+function LockscreenNotifications:closeWeatherScreensaver()
     if self.weather_screensaver_widget then
         local Screensaver = require("ui/screensaver")
         if Screensaver.screensaver_widget == self.weather_screensaver_widget then
             -- Screensaver:cleanup (via onCloseWidget) nils KOReader's reference
             UIManager:close(self.weather_screensaver_widget)
-            logger.dbg("WeatherLockscreen: Closed weather screensaver widget")
+            logger.dbg("LockscreenNotifications: Closed weather screensaver widget")
         end
         self.weather_screensaver_widget = nil
     end
 end
 
-function WeatherLockscreen:onResume()
-    logger.dbg("WeatherLockscreen: Device resuming")
+function LockscreenNotifications:onResume()
+    logger.dbg("LockscreenNotifications: Device resuming")
 
     -- Check if we woke up due to an RTC alarm and execute the action
     if self.simulated_wakeup then
@@ -727,13 +733,13 @@ function WeatherLockscreen:onResume()
 
         -- Reset the flag
         self.simulated_wakeup = false
-        logger.info("WeatherLockscreen: Woke up from scheduled RTC alarm")
+        logger.info("LockscreenNotifications: Woke up from scheduled RTC alarm")
 
         -- Close any existing loading widget.
         if self.loading_widget then
             UIManager:close(self.loading_widget)
             self.loading_widget = nil
-            logger.dbg("WeatherLockscreen: Closed existing loading widget")
+            logger.dbg("LockscreenNotifications: Closed existing loading widget")
         end
 
         -- Cache-first refresh: on a Kindle RTC wake the screensaver widget is
@@ -768,28 +774,28 @@ function WeatherLockscreen:onResume()
             if not (Device.screen_saver_mode
                     and (G_reader_settings:readSetting("screensaver_type") == "weather"
                         or G_reader_settings:readSetting("screensaver_type") == "notifications")) then
-                logger.info("WeatherLockscreen: Sleep screen gone, skipping re-suspend")
+                logger.info("LockscreenNotifications: Sleep screen gone, skipping re-suspend")
                 return
             end
             if self.refresh and retries < 3 then
                 retries = retries + 1
-                logger.info("WeatherLockscreen: Refresh incomplete, retrying fetch, attempt", retries)
+                logger.info("LockscreenNotifications: Refresh incomplete, retrying fetch, attempt", retries)
                 self.active_sleep_refresh = true
                 Screensaver:show()
                 UIManager:scheduleIn(5, retryOrSuspend)
                 return
             end
-            logger.info("WeatherLockscreen: Triggering suspend after refresh")
+            logger.info("LockscreenNotifications: Triggering suspend after refresh")
             WeatherUtils:toggleSuspend()
         end
         UIManager:scheduleIn(5, retryOrSuspend)
     else
-        logger.dbg("WeatherLockscreen: Manual wakeup, not from RTC alarm")
+        logger.dbg("LockscreenNotifications: Manual wakeup, not from RTC alarm")
         -- Close any existing loading widget
         if self.loading_widget then
             UIManager:close(self.loading_widget)
             self.loading_widget = nil
-            logger.dbg("WeatherLockscreen: Closed existing loading widget")
+            logger.dbg("LockscreenNotifications: Closed existing loading widget")
         end
 
         -- Tear down only when the sleep screen is really over. On wakes that
@@ -808,7 +814,7 @@ function WeatherLockscreen:onResume()
     end
 end
 
-function WeatherLockscreen:onCloseWidget()
+function LockscreenNotifications:onCloseWidget()
     -- Stop dashboard mode
     if self.dashboard_mode_enabled then
         WeatherDashboard:stop(self)
@@ -820,10 +826,10 @@ function WeatherLockscreen:onCloseWidget()
 
     -- Cancel RTC wakeup tasks on close
     if self.rtc_wakeup_scheduled and self.wakeup_mgr then
-        logger.dbg("WeatherLockscreen: Cancelling RTC periodic refresh on close")
+        logger.dbg("LockscreenNotifications: Cancelling RTC periodic refresh on close")
         self.wakeup_mgr:removeTasks(nil, self.rtcRefreshCallback)
         self.rtc_wakeup_scheduled = false
     end
 end
 
-return WeatherLockscreen
+return LockscreenNotifications

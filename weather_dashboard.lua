@@ -24,17 +24,17 @@ local WeatherDashboard = {}
 
 function WeatherDashboard:start(weather_lockscreen)
     if weather_lockscreen.dashboard_mode_enabled then
-        logger.info("WeatherLockscreen: Dashboard mode already active")
+        logger.info("LockscreenNotifications: Dashboard mode already active")
         return
     end
 
-    logger.info("WeatherLockscreen: Starting dashboard mode")
+    logger.info("LockscreenNotifications: Starting dashboard mode")
     weather_lockscreen.dashboard_mode_enabled = true
 
     -- Prevent device from auto-suspending
     PluginShare.pause_auto_suspend = true
     UIManager:preventStandby()
-    logger.info("WeatherLockscreen: Device sleep prevented")
+    logger.info("LockscreenNotifications: Device sleep prevented")
 
     -- Suspend frontlight intensity
     WeatherUtils:suspendFrontlight(weather_lockscreen)
@@ -52,11 +52,11 @@ end
 
 function WeatherDashboard:stop(weather_lockscreen)
     if not weather_lockscreen.dashboard_mode_enabled then
-        logger.dbg("WeatherLockscreen: Dashboard mode already stopped")
+        logger.dbg("LockscreenNotifications: Dashboard mode already stopped")
         return
     end
 
-    logger.info("WeatherLockscreen: Stopping dashboard mode")
+    logger.info("LockscreenNotifications: Stopping dashboard mode")
 
     -- Stop periodic AutoSuspend timer reset
     self:unscheduleAutosuspendReset(weather_lockscreen)
@@ -87,16 +87,16 @@ function WeatherDashboard:stop(weather_lockscreen)
     -- Re-enable auto-suspend
     PluginShare.pause_auto_suspend = false
     UIManager:allowStandby()
-    logger.info("WeatherLockscreen: Device sleep re-enabled")
+    logger.info("LockscreenNotifications: Device sleep re-enabled")
 end
 
 function WeatherDashboard:showWidget(weather_lockscreen)
     if not weather_lockscreen.dashboard_mode_enabled then
-        logger.dbg("WeatherLockscreen: Dashboard mode disabled, not showing widget")
+        logger.dbg("LockscreenNotifications: Dashboard mode disabled, not showing widget")
         return
     end
 
-    logger.info("WeatherLockscreen: Showing dashboard widget")
+    logger.info("LockscreenNotifications: Showing dashboard widget")
 
     -- An in-place refresh has a dashboard widget already on screen. In that case
     -- we keep the existing weather visible and swap it once the new one is built,
@@ -116,7 +116,7 @@ function WeatherDashboard:showWidget(weather_lockscreen)
         weather_lockscreen.loading_widget = DisplayHelper:createLoadingWidget()
         if weather_lockscreen.loading_widget then
             UIManager:show(weather_lockscreen.loading_widget, "full")
-            logger.dbg("WeatherLockscreen: Loading widget displayed")
+            logger.dbg("LockscreenNotifications: Loading widget displayed")
         end
     end
 
@@ -127,7 +127,7 @@ function WeatherDashboard:showWidget(weather_lockscreen)
     local function dashboardShow()
         local weather_widget, fallback = weather_lockscreen:createWeatherWidget()
         if not weather_widget then
-            logger.warn("WeatherLockscreen: Failed to create weather widget")
+            logger.warn("LockscreenNotifications: Failed to create weather widget")
             -- Close the loading widget (shown on first start) before stopping
             if weather_lockscreen.loading_widget then
                 UIManager:close(weather_lockscreen.loading_widget)
@@ -187,21 +187,21 @@ function WeatherDashboard:showWidget(weather_lockscreen)
 
         -- Add tap handler to close and stop dashboard mode (like ScreenSaverWidget:onTap)
         weather_lockscreen.dashboard_widget.onTap = function(self_widget, _, ges)
-            logger.info("WeatherLockscreen: Dashboard dismissed by tap")
+            logger.info("LockscreenNotifications: Dashboard dismissed by tap")
             dashboard_module:stop(plugin_instance)
             return true
         end
 
         -- Add close handler (can be called by system events)
         weather_lockscreen.dashboard_widget.onClose = function()
-            logger.info("WeatherLockscreen: Dashboard onClose called")
+            logger.info("LockscreenNotifications: Dashboard onClose called")
             dashboard_module:stop(plugin_instance)
             return true
         end
 
         -- Add key press handler for non-touch devices
         weather_lockscreen.dashboard_widget.onAnyKeyPressed = function()
-            logger.info("WeatherLockscreen: Dashboard dismissed by key press")
+            logger.info("LockscreenNotifications: Dashboard dismissed by key press")
             dashboard_module:stop(plugin_instance)
             return true
         end
@@ -239,13 +239,13 @@ function WeatherDashboard:showWidget(weather_lockscreen)
         if weather_lockscreen.loading_widget then
             UIManager:close(weather_lockscreen.loading_widget)
             weather_lockscreen.loading_widget = nil
-            logger.dbg("WeatherLockscreen: Loading widget closed")
+            logger.dbg("LockscreenNotifications: Loading widget closed")
         end
 
         -- Trigger screen refresh (like TRMNL does)
         UIManager:setDirty(weather_lockscreen.dashboard_widget, "full")
         UIManager:forceRePaint()
-        logger.info("WeatherLockscreen: Dashboard widget displayed")
+        logger.info("LockscreenNotifications: Dashboard widget displayed")
 
         -- Schedule next refresh
         self:scheduleNextRefresh(weather_lockscreen)
@@ -253,25 +253,25 @@ function WeatherDashboard:showWidget(weather_lockscreen)
 
     -- Create weather widget
     if WeatherUtils:wifiEnableActionTurnOn() then
-        logger.dbg("WeatherLockscreen: Creating dashboard widget (will wait for network if needed)")
+        logger.dbg("LockscreenNotifications: Creating dashboard widget (will wait for network if needed)")
 
         -- Use safe wrapper to go online with proper error handling
         -- call_after_wifi_action = true to respect wifi_disable_action setting (saves power between refreshes)
         WeatherUtils:safeGoOnlineToRun(
             function()
-                logger.dbg("WeatherLockscreen: Network is online, showing dashboard")
+                logger.dbg("LockscreenNotifications: Network is online, showing dashboard")
                 dashboardShow()
             end,
             function()
                 -- Fallback: show dashboard anyway with potentially cached data
-                logger.dbg("WeatherLockscreen: Network connection failed, showing dashboard with cached data")
+                logger.dbg("LockscreenNotifications: Network connection failed, showing dashboard with cached data")
                 dashboardShow()
             end,
             true, -- suppress network messages
             true  -- call afterWifiAction when done (respects wifi_disable_action)
         )
     else
-        logger.dbg("WeatherLockscreen: Creating dashboard widget (will not wait for network)")
+        logger.dbg("LockscreenNotifications: Creating dashboard widget (will not wait for network)")
         dashboardShow()
     end
 end
@@ -283,10 +283,10 @@ function WeatherDashboard:scheduleNextRefresh(weather_lockscreen)
 
     local interval = WeatherUtils:getEffectiveRefreshInterval("dashboard")
     if interval > 0 then
-        logger.info("WeatherLockscreen: Scheduling next dashboard refresh in", interval, "seconds")
+        logger.info("LockscreenNotifications: Scheduling next dashboard refresh in", interval, "seconds")
         UIManager:scheduleIn(interval, weather_lockscreen.dashboard_refresh_task)
     else
-        logger.warn("WeatherLockscreen: Dashboard mode enabled but interval is 0, stopping")
+        logger.warn("LockscreenNotifications: Dashboard mode enabled but interval is 0, stopping")
         self:stop(weather_lockscreen)
     end
 end
@@ -298,7 +298,7 @@ function WeatherDashboard:scheduleAutosuspendReset(weather_lockscreen)
         weather_lockscreen.autosuspend_reset_task = function()
             if weather_lockscreen.dashboard_mode_enabled then
                 UIManager:broadcastEvent(require("ui/event"):new("InputEvent"))
-                logger.dbg("WeatherLockscreen: Broadcast InputEvent to reset AutoSuspend timers")
+                logger.dbg("LockscreenNotifications: Broadcast InputEvent to reset AutoSuspend timers")
                 -- Reschedule for 3 minutes later
                 UIManager:scheduleIn(180, weather_lockscreen.autosuspend_reset_task)
             end
@@ -307,7 +307,7 @@ function WeatherDashboard:scheduleAutosuspendReset(weather_lockscreen)
 
     -- Broadcast immediately and schedule first check in 3 minutes
     UIManager:broadcastEvent(require("ui/event"):new("InputEvent"))
-    logger.dbg("WeatherLockscreen: Initial InputEvent broadcast, scheduling periodic resets every 3 minutes")
+    logger.dbg("LockscreenNotifications: Initial InputEvent broadcast, scheduling periodic resets every 3 minutes")
     UIManager:scheduleIn(180, weather_lockscreen.autosuspend_reset_task)
 end
 
@@ -315,7 +315,7 @@ end
 function WeatherDashboard:unscheduleAutosuspendReset(weather_lockscreen)
     if weather_lockscreen.autosuspend_reset_task then
         UIManager:unschedule(weather_lockscreen.autosuspend_reset_task)
-        logger.dbg("WeatherLockscreen: Unscheduled AutoSuspend timer reset task")
+        logger.dbg("LockscreenNotifications: Unscheduled AutoSuspend timer reset task")
     end
 end
 
@@ -324,7 +324,7 @@ function WeatherDashboard:onSuspend(weather_lockscreen)
     if weather_lockscreen.dashboard_mode_enabled then
         if weather_lockscreen.dashboard_refresh_task then
             UIManager:unschedule(weather_lockscreen.dashboard_refresh_task)
-            logger.dbg("WeatherLockscreen: Dashboard refresh task unscheduled for suspend")
+            logger.dbg("LockscreenNotifications: Dashboard refresh task unscheduled for suspend")
         end
         self:unscheduleAutosuspendReset(weather_lockscreen)
         return true -- Indicates dashboard handled suspend

@@ -1,8 +1,8 @@
 local _ = require("l10n/gettext")
 return {
-    name = "weatherlockscreen",
-    fullname = _("Weather & Notifications Lockscreen"),
+    name = "notificationslockscreen",
+    fullname = _("Lock Screen Notifications"),
     description = _(
-        [[Displays weather or read-only notifications on the sleep screen.]]),
-    version = "v0.9.7-beta.1-notifications.1"
+        [[Displays a read-only notification feed on the KOReader sleep screen. Optional weather display is also included.]]),
+    version = "v0.1.0"
 }

@@ -23,9 +23,9 @@ The notification canvas reads one JSON document with an HTTP `GET`. It is intend
 ## Setup
 
 1. Serve the JSON from a stable address reachable on the same trusted Wi-Fi network as the Kindle. A small endpoint on a home computer or NAS is sufficient.
-2. In KOReader, open **Tools > Weather & Notifications Lockscreen** and enter the feed URL, for example `http://192.168.1.20:8080/notifications.json`.
+2. In KOReader, open **Tools > Lock Screen Notifications** and enter the feed URL, for example `http://192.168.1.20:8080/notifications.json`.
 3. In **Settings > Screen > Sleep Screen > Wallpaper**, choose **Show notifications on sleep screen**.
-4. Set **Active Sleep** to a refresh interval if you want the sleep screen to refresh while the Kindle is on battery. It remains off until enabled. The feature requires KOReader's Wi-Fi action to be set to **Turn on**.
+4. In **Tools > Lock Screen Notifications**, set **Active Sleep** to a refresh interval if you want the sleep screen to refresh while the Kindle is on battery. It remains off until enabled. The feature requires KOReader's Wi-Fi action to be set to **Turn on**.
 
 On battery, the existing RTC-based Active Sleep path wakes the device at the configured interval, fetches the feed, updates the screen, and suspends again. While connected to external power, the upstream plugin uses a standby timer because Kindle RTC wakeups do not fire during deep suspend on power. Device behavior and battery use still need to be checked on each Kindle model and firmware.
 

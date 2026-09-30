@@ -6,7 +6,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: WeatherLockscreen\n"
+"Project-Id-Version: KOReader Lock Screen Notifications\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-18 12:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -24,10 +24,13 @@ msgstr ""
 msgid "Weather Lockscreen"
 msgstr ""
 
-msgid "Weather & Notifications Lockscreen"
+msgid "Lock Screen Notifications"
 msgstr ""
 
-msgid "Displays weather or read-only notifications on the sleep screen."
+msgid "Displays a read-only notification feed on the KOReader sleep screen. Optional weather display is also included."
+msgstr ""
+
+msgid "Weather display (optional)"
 msgstr ""
 
 msgid "Show notifications on sleep screen"
@@ -39,7 +42,7 @@ msgstr ""
 msgid "%1 pending"
 msgstr ""
 
-msgid "Set the notification feed URL in Tools > Weather & Notifications Lockscreen."
+msgid "Set the notification feed URL in Tools > Lock Screen Notifications."
 msgstr ""
 
 msgid "No pending notifications."

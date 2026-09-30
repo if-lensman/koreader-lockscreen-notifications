@@ -1,5 +1,5 @@
 {
-  description = "WeatherLockscreen dev environment (lua5.1 for syntax checks, gettext for translations)";
+  description = "KOReader Lock Screen Notifications dev environment (Lua and gettext tools)";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -11,17 +11,17 @@
     {
       packages = forAllSystems (pkgs: {
         default = pkgs.buildEnv {
-          name = "weatherlockscreen-tools";
+          name = "notificationslockscreen-tools";
           paths = [ pkgs.lua5_1 pkgs.gettext pkgs.bash pkgs.rsync pkgs.zip pkgs.unzip ];
         };
       });
 
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
-          name = "weatherlockscreen-dev";
+          name = "notificationslockscreen-dev";
           buildInputs = [ pkgs.lua5_1 pkgs.gettext pkgs.bash pkgs.rsync pkgs.zip pkgs.unzip ];
           shellHook = ''
-            echo "WeatherLockscreen dev shell: luac $(luac -v 2>&1 | head -n1), $(msgfmt --version | head -n1)"
+            echo "Lock Screen Notifications dev shell: luac $(luac -v 2>&1 | head -n1), $(msgfmt --version | head -n1)"
           '';
         };
       });
